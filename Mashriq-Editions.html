@@ -87,6 +87,7 @@
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
 window.LEVANT_CONTENT = {
@@ -720,6 +721,11 @@ function BayCity({ hatch }) {
 const C = window.LEVANT_CONTENT;
 const isAr = (lang) => lang === "ar";
 
+// Supabase — URL + anon key are public by design (RLS-protected). Secret keys live in .env / server only.
+const SUPABASE_URL = "https://srfzinkxkwrpbzovkgxz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNyZnppbmt4a3dycGJ6b3ZrZ3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzOTAwMjMsImV4cCI6MjA5NDk2NjAyM30.o1-P3im0VVP0ueU-jAXy2W9crGCTVs9cJ8eMfUXP89c";
+const sb = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
 function Pill({ children, className="" }) {
   return <span className={`num inline-flex items-center justify-center text-[10px] leading-none px-1.5 py-1 rounded-sm border border-ink/40 text-ink/80 ${className}`}>{children}</span>;
 }
@@ -1079,10 +1085,12 @@ function FindYourCity({ lang }) {
     ar:{tag:"من الأرشيف",h:"ابحث عن مدينتك",p:"أخبِرنا بمدينة عائلتك — سنكتب إليك حين تجهز لوحتها، ونرسل لك إصدارات الأرشيف الجديدة.",ph:"you@example.com",btn:"أبقِني على اطّلاع",ok:"شكرًا — أنت الآن على القائمة."},
     fr:{tag:"De l'archive",h:"Trouvez votre ville",p:"Dites-nous la ville de votre famille — nous écrirons dès que sa planche sera prête, avec les nouveautés de l'archive.",ph:"vous@exemple.com",btn:"Tenez-moi informé",ok:"Merci — vous êtes inscrit."},
   }[lang];
-  function submit(e){
+  async function submit(e){
     e.preventDefault();
     if(!email) return;
-    try{ const k="mashriq_subs"; const a=JSON.parse(localStorage.getItem(k)||"[]"); a.push({email,lang,at:Date.now()}); localStorage.setItem(k,JSON.stringify(a)); }catch(_){}
+    let ok=false;
+    if(sb){ try{ const {error}=await sb.from("newsletter_subscribers").insert({email,locale:lang}); ok=!error; }catch(_){} }
+    if(!ok){ try{ const k="mashriq_subs"; const a=JSON.parse(localStorage.getItem(k)||"[]"); a.push({email,lang,at:Date.now()}); localStorage.setItem(k,JSON.stringify(a)); }catch(_){} }
     setDone(true);
   }
   return (
