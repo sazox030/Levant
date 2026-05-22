@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Mashriq Editions — Historic Maps of the Levant</title>
+<script src="https://unpkg.com/@tailwindcss/browser@4.1.5/dist/index.global.js"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --color-parchment: #F4EEE4;
+    --color-parchdeep: #EBE2D2;
+    --color-ink:       #1F1A14;
+    --color-indigo:    #3A4A66;
+    --color-rust:      #9C4A2E;
+    --color-warmgrey:  #8A7F6E;
+    --font-serif: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", Baskerville, "Times New Roman", serif;
+    --font-sans:  ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+</style>
+<style>
+  html, body { background:#F4EEE4; color:#1F1A14; }
+  body { font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", Baskerville, "Times New Roman", serif; }
+  body::before {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      radial-gradient(rgba(31,26,20,0.04) 1px, transparent 1px),
+      radial-gradient(rgba(31,26,20,0.025) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 1px 2px;
+    mix-blend-mode: multiply;
+    opacity: 0.7;
+  }
+  #app { position: relative; z-index: 1; }
+  .smallcaps { font-variant: all-small-caps; letter-spacing: 0.08em; }
+  .num { font-family: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; font-feature-settings: "tnum" 1; }
+  .lede p { line-height: 1.75; }
+  .hair { border-color: rgba(31,26,20,0.18); }
+  @keyframes plateIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .plate-in { animation: plateIn 600ms ease-out both; }
+  [dir="rtl"] .num { font-family: ui-serif, Georgia, "Times New Roman", serif; }
+  .no-bar::-webkit-scrollbar { display:none; }
+  .no-bar { scrollbar-width: none; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script>
+window.LEVANT_CONTENT = {
+  brand: { en: "Mashriq Editions", ar: "إصدارات المشرق", fr: "Éditions Mashriq" },
+  tagline: {
+    en: "Maps of the Levant, 1850–1948",
+    ar: "خرائط بلاد الشام، ١٨٥٠–١٩٤٨",
+    fr: "Cartes du Levant, 1850–1948",
+  },
+  nav: {
+    en: { collections: "Collections", archive: "The Archive", about: "About", cart: "Cart" },
+    ar: { collections: "المجموعات", archive: "الأرشيف", about: "عن الدار", cart: "السلّة" },
+    fr: { collections: "Collections", archive: "L’Archive", about: "À propos", cart: "Panier" },
+  },
+  langLabel: { en: "EN", ar: "ع", fr: "FR" },
+  hero: {
+    en: { title: "Beirut, 1900", sub: "From the Mediterranean coast, before the borders.", cta: "Enter the archive" },
+    ar: { title: "بيروت ١٩٠٠", sub: "من السّاحل المتوسّطي، قبل الحدود.", cta: "ادخل الأرشيف" },
+    fr: { title: "Beyrouth, 1900", sub: "Depuis la côte méditerranéenne, avant les frontières.", cta: "Entrer dans l’archive" },
+  },
+  intro: {
+    en: [
+      "Before the boulevards, before the airport, before the borders, there was a coastline of cities that ran from Antakya to Gaza.",
+      "We hold an archive of how they looked, drawn by the hands who knew them. Each map is reprinted to order, on cotton paper, from presses in Beirut and Berlin.",
+    ],
+    ar: [
+      "قبل الجادّات، وقبل المطار، وقبل الحدود، كان ثمّة ساحلٌ من المدن يمتدّ من أنطاكية إلى غزّة.",
+      "نحفظ أرشيفًا لصورتها كما رسمتها أيادٍ عرفتها. تُطبع كلّ خريطة عند الطلب، على ورقٍ قطنيّ، في مطابع بيروت وبرلين.",
+    ],
+    fr: [
+      "Avant les boulevards, avant l’aéroport, avant les frontières, il y avait un littoral de villes qui allait d’Antakya à Gaza.",
+      "Nous gardons une archive de leur visage, dessinée par les mains qui les connurent. Chaque carte est réimprimée à la commande, sur papier coton, à Beyrouth et à Berlin.",
+    ],
+  },
+  collectionsHeading: { en: "Collections", ar: "المجموعات", fr: "Collections" },
+  collections: [
+    { id:"damascus",  name:{en:"Damascus",ar:"دمشق",fr:"Damas"},     desc:{en:"The walled city and the seven gates, 1860 to 1932.",ar:"المدينة المُسوَّرة والأبواب السّبعة، من ١٨٦٠ إلى ١٩٣٢.",fr:"La ville close et ses sept portes, de 1860 à 1932."}, count:14 },
+    { id:"jerusalem", name:{en:"Jerusalem",ar:"القُدس",fr:"Jérusalem"}, desc:{en:"Inside the Old City, before the Mandate divided the quarters.",ar:"داخل البلدة القديمة، قبل أن يقسّم الانتداب الحارات.",fr:"Dans la Vieille Ville, avant que le Mandat ne divise les quartiers."}, count:11 },
+    { id:"aleppo",    name:{en:"Aleppo",ar:"حلب",fr:"Alep"},         desc:{en:"The citadel, the souks, and the lines that ran to Anatolia.",ar:"القلعة، والأسواق، والسّكك الممتدّة نحو الأناضول.",fr:"La citadelle, les souks et les voies qui filaient vers l’Anatolie."}, count:17 },
+    { id:"jaffa",     name:{en:"Jaffa",ar:"يافا",fr:"Jaffa"},        desc:{en:"Orchards, port, and railway before the road to Tel Aviv.",ar:"البساتين والميناء والسّكك قبل طريق تل أبيب.",fr:"Vergers, port et chemin de fer avant la route de Tel-Aviv."}, count:8 },
+  ],
+  featured: {
+    heading: { en: "Beirut, layered", ar: "بيروت، طبقات", fr: "Beyrouth, en couches" },
+    note: {
+      en: "Two surveys, eighty-six years apart, drawn over the same coast.",
+      ar: "مسحان بينهما ستّةٌ وثمانون عامًا، فوق السّاحل نفسه.",
+      fr: "Deux levés à quatre-vingt-six ans d’écart, sur la même côte.",
+    },
+    layers: {
+      en: { y1900: "1900", today: "Today", overlay: "Overlay" },
+      ar: { y1900: "١٩٠٠", today: "اليوم", overlay: "تركيب" },
+      fr: { y1900: "1900", today: "Aujourd’hui", overlay: "Superposition" },
+    },
+    legend: {
+      en: { old: "1900 plate", new: "2024 survey" },
+      ar: { old: "لوحة ١٩٠٠", new: "مسح ٢٠٢٤" },
+      fr: { old: "Plaque 1900", new: "Relevé 2024" },
+    },
+  },
+  archiveHeading: { en: "The Archive", ar: "الأرشيف", fr: "L’Archive" },
+  archiveSub: {
+    en: "A finite, finished collection. Forty-two plates, drawn from public archives and reissued in a single house style.",
+    ar: "مجموعةٌ منتهيةٌ ومحدودة. اثنتان وأربعون لوحةً، مأخوذةٌ من أرشيفاتٍ عامّة ومعادُ إخراجُها بأسلوبِ الدّار.",
+    fr: "Une collection finie. Quarante-deux planches, tirées d’archives publiques et rééditées dans un style maison unique.",
+  },
+  materials: {
+    en: { digital: "Digital", print: "Print", framed: "Framed" },
+    ar: { digital: "رقميّة", print: "مطبوعة", framed: "مؤطّرة" },
+    fr: { digital: "Numérique", print: "Tirage", framed: "Encadrée" },
+  },
+  archive: [
+    { id:"dam1893", city:{en:"Damascus",ar:"دمشق",fr:"Damas"},      year:1893, material:"framed",  price:145, kind:"walled" },
+    { id:"jer1883", city:{en:"Jerusalem",ar:"القُدس",fr:"Jérusalem"}, year:1883, material:"print",   price:75,  kind:"oldcity" },
+    { id:"alp1912", city:{en:"Aleppo",ar:"حلب",fr:"Alep"},          year:1912, material:"print",   price:75,  kind:"citadel" },
+    { id:"jaf1878", city:{en:"Jaffa",ar:"يافا",fr:"Jaffa"},         year:1878, material:"digital", price:25,  kind:"coastgrid" },
+    { id:"bey1876", city:{en:"Beirut",ar:"بيروت",fr:"Beyrouth"},     year:1876, material:"framed",  price:145, kind:"peninsula" },
+    { id:"tri1898", city:{en:"Tripoli",ar:"طرابلس",fr:"Tripoli"},    year:1898, material:"print",   price:75,  kind:"twincity" },
+    { id:"ant1906", city:{en:"Antakya",ar:"أنطاكية",fr:"Antakya"},   year:1906, material:"digital", price:25,  kind:"river" },
+    { id:"hai1925", city:{en:"Haifa",ar:"حيفا",fr:"Haïfa"},         year:1925, material:"framed",  price:145, kind:"bay" },
+  ],
+  detail: {
+    paper: { en: "Paper", ar: "الورق", fr: "Papier" },
+    paperVal: { en: "300gsm cotton rag, deckle edge", ar: "ورق قطن ٣٠٠ غرام، حاشية يدويّة", fr: "Papier coton 300 g/m², bord frangé" },
+    size: { en: "Size", ar: "القياس", fr: "Format" },
+    sizeVal: { en: "50 × 70 cm", ar: "٥٠ × ٧٠ سم", fr: "50 × 70 cm" },
+    source: { en: "Source plate", ar: "اللوحة الأصل", fr: "Planche d’origine" },
+    add:   { en: "Add to cart", ar: "أضف إلى السلّة", fr: "Ajouter au panier" },
+    close: { en: "Close", ar: "إغلاق", fr: "Fermer" },
+    notes: {
+      dam1893: { en:"Surveyed by the Ottoman Ministry of Public Works ahead of the Hijaz Railway. The seven gates are named in Arabic and transliterated to French in the original cartouche.", ar:"مسحٌ أجرته نظارة النّافعة العثمانيّة قُبيل سكّة حديد الحجاز. الأبواب السّبعة مُسمّاة بالعربيّة ومنقولة إلى الفرنسيّة في الكرتوش الأصليّ.", fr:"Levé par le Ministère ottoman des Travaux publics à la veille du Hedjaz. Les sept portes sont nommées en arabe et translittérées en français dans le cartouche d’origine." },
+      jer1883: { en:"Charles Wilson’s Ordnance Survey of Jerusalem, reissued at the original scale.", ar:"مسح تشارلز ولسون للقدس، أُعيد إصداره بالمقياس الأصليّ.", fr:"Ordnance Survey de Jérusalem par Charles Wilson, ressorti à l’échelle d’origine." },
+      alp1912: { en:"Drawn for the Baghdad Railway concession. Souks shown lane by lane.", ar:"رُسمت لامتياز سكّة حديد بغداد. الأسواق مرسومة زاروبًا زاروبًا.", fr:"Dessinée pour la concession du Bagdadbahn. Souks figurés ruelle par ruelle." },
+      jaf1878: { en:"Lithograph plate from the Palestine Exploration Fund, before the German Colony expanded south.", ar:"لوحة ليتوغرافيّة من صندوق استكشاف فلسطين، قبل امتداد المستعمرة الألمانيّة جنوبًا.", fr:"Lithographie du Palestine Exploration Fund, avant l’extension sud de la Colonie allemande." },
+      bey1876: { en:"Julius Löytved’s plan of Beirut as a free port, with the silk khans of Bab Idriss labelled by family.", ar:"مخطّط يوليوس لويتفد لبيروت ميناءً حرًّا، مع تسمية خانات الحرير في باب إدريس باسم العائلات.", fr:"Plan de Beyrouth comme port franc par Julius Löytved, avec les khans de la soie de Bab Idriss nommés par famille." },
+      tri1898: { en:"Twin cities of Al-Mina and Tripoli proper, joined by the tramway of the Société des Tramways de Tripoli.", ar:"مدينتا الميناء وطرابلس، يصلهما ترام شركة ترامواي طرابلس.", fr:"Les villes jumelles d’Al-Mina et Tripoli, reliées par le tramway de la Société des Tramways de Tripoli." },
+      ant1906: { en:"Antioch on both banks of the Orontes, with the Roman bridge still in service.", ar:"أنطاكية على ضفّتي العاصي، والجسر الرّومانيّ لا يزال في الخدمة.", fr:"Antioche sur les deux rives de l’Oronte, le pont romain encore en service." },
+      hai1925: { en:"British Mandate cadastre showing the new harbour works at the foot of Mount Carmel.", ar:"كاداستر الانتداب البريطانيّ مُظهرًا أعمال الميناء الجديد عند سفح الكرمل.", fr:"Cadastre du Mandat britannique montrant les nouveaux travaux portuaires au pied du Carmel." },
+    },
+  },
+  provenance: {
+    heading: { en: "Provenance", ar: "المصادر", fr: "Provenance" },
+    body: {
+      en: "Every plate begins from a public-domain source. We re-render it in a consistent ink palette and typography so that a Beirut survey of 1876 and an Aleppo survey of 1912 can hang in the same room without arguing.",
+      ar: "تبدأ كلّ لوحة من مصدرٍ في الملكيّة العامّة. نُعيد إخراجَها بحبرٍ وأسلوبٍ طباعيٍّ موحَّد، حتّى يستطيع مسحُ بيروت ١٨٧٦ ومسحُ حلب ١٩١٢ أن يتجاورا على الجدار ذاته بسلام.",
+      fr: "Chaque planche part d’une source du domaine public. Nous la redessinons dans une encre et une typographie cohérentes, pour qu’un levé de Beyrouth de 1876 et un levé d’Alep de 1912 puissent cohabiter sur le même mur.",
+    },
+    sources: [
+      { name:"Library of Congress",                note:{en:"Geography and Map Division, Washington.",ar:"قسم الجغرافيا والخرائط، واشنطن.",fr:"Geography and Map Division, Washington."} },
+      { name:"Bibliothèque nationale de France",   note:{en:"Cartes et plans via Gallica.",ar:"قسم الخرائط عبر غاليكا.",fr:"Cartes et plans via Gallica."} },
+      { name:"David Rumsey Map Collection",        note:{en:"Stanford University Libraries.",ar:"مكتبات جامعة ستانفورد.",fr:"Stanford University Libraries."} },
+      { name:"Wikimedia Commons",                  note:{en:"Public-domain plates, contributor-attributed.",ar:"لوحات في الملك العام، مع نسب المساهمين.",fr:"Planches du domaine public, attribuées aux contributeurs."} },
+    ],
+  },
+  footer: {
+    cols: {
+      en: { nav:["Collections","The Archive","About","Press"], contact:["orders@mashriq.editions","Mar Mikhael, Beirut","Mon–Fri, 10:00–18:00"], legal:["Terms","Returns","Privacy"] },
+      ar: { nav:["المجموعات","الأرشيف","عن الدار","الصّحافة"], contact:["orders@mashriq.editions","مار مخايل، بيروت","من الإثنين إلى الجمعة، ١٠:٠٠–١٨:٠٠"], legal:["الشّروط","الإرجاع","الخصوصيّة"] },
+      fr: { nav:["Collections","L’Archive","À propos","Presse"], contact:["orders@mashriq.editions","Mar Mikhaël, Beyrouth","Lun–Ven, 10h00–18h00"], legal:["Conditions","Retours","Confidentialité"] },
+    },
+    printers: {
+      en: "Printed at Mar Mikhael Lithograph, Beirut, and Druckerei Conrad Sasse, Berlin.",
+      ar: "تُطبع لدى ليتوغراف مار مخايل في بيروت، ومطبعة كونراد ساسه في برلين.",
+      fr: "Imprimé chez Mar Mikhaël Lithograph, Beyrouth, et Druckerei Conrad Sasse, Berlin.",
+    },
+    rights: {
+      en: "© 2026 Mashriq Editions. All plates reissued under public-domain licence.",
+      ar: "© ٢٠٢٦ إصدارات المشرق. جميع اللوحات مُعاد إصدارُها بترخيصِ الملكيّة العامّة.",
+      fr: "© 2026 Éditions Mashriq. Toutes les planches rééditées sous licence du domaine public.",
+    },
+  },
+};
+</script>
+
+<script type="text/babel">
+/* maps + app — Mashriq Editions */
+const { useId, useState, useEffect, useRef } = React;
+
+const INK="#1F1A14", INDIGO="#3A4A66", RUST="#9C4A2E", GREY="#8A7F6E", PARCH="#F4EEE4";
+
+function HatchDefs({ idHatch, idStipple, color=INDIGO, density=6 }) {
+  return (
+    <defs>
+      <pattern id={idHatch} width={density} height={density} patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+        <line x1="0" y1="0" x2="0" y2={density} stroke={color} strokeWidth="0.45" opacity="0.55"/>
+      </pattern>
+      <pattern id={idStipple} width="5" height="5" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="0.45" fill={color} opacity="0.55"/>
+      </pattern>
+    </defs>
+  );
+}
+
+function PlateFrame({ w, h, pad=14, ticks=true }) {
+  const inner = pad + 6;
+  return (
+    <g fill="none" stroke={INK} opacity="0.78">
+      <rect x={pad} y={pad} width={w-2*pad} height={h-2*pad} strokeWidth="0.7"/>
+      <rect x={inner} y={inner} width={w-2*inner} height={h-2*inner} strokeWidth="0.35"/>
+      {ticks && (
+        <g strokeWidth="0.4" opacity="0.8">
+          {Array.from({length: Math.floor((w-2*inner)/24)-1}).map((_,i)=>{
+            const x=inner+24*(i+1);
+            return <g key={"tx"+i}><line x1={x} y1={inner} x2={x} y2={inner+3}/><line x1={x} y1={h-inner} x2={x} y2={h-inner-3}/></g>;
+          })}
+          {Array.from({length: Math.floor((h-2*inner)/24)-1}).map((_,i)=>{
+            const y=inner+24*(i+1);
+            return <g key={"ty"+i}><line x1={inner} y1={y} x2={inner+3} y2={y}/><line x1={w-inner} y1={y} x2={w-inner-3} y2={y}/></g>;
+          })}
+        </g>
+      )}
+    </g>
+  );
+}
+
+function CompassRose({ cx, cy, r=14, color=INK }) {
+  return (
+    <g stroke={color} fill="none" strokeWidth="0.6" opacity="0.85">
+      <circle cx={cx} cy={cy} r={r}/>
+      <circle cx={cx} cy={cy} r={r*0.55} strokeWidth="0.35"/>
+      <line x1={cx} y1={cy-r-4} x2={cx} y2={cy+r+4}/>
+      <line x1={cx-r-4} y1={cy} x2={cx+r+4} y2={cy}/>
+      <polygon points={`${cx},${cy-r} ${cx-3},${cy} ${cx+3},${cy}`} fill={color} opacity="0.9" stroke="none"/>
+      <text x={cx} y={cy-r-7} textAnchor="middle" fontSize="6.5" fill={color} stroke="none" fontStyle="italic">N</text>
+    </g>
+  );
+}
+
+function Cartouche({ x, y, w, h, title, subtitle, color=INK }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} fill={PARCH} stroke={color} strokeWidth="0.6" opacity="0.95"/>
+      <rect x={x+3} y={y+3} width={w-6} height={h-6} fill="none" stroke={color} strokeWidth="0.25"/>
+      <text x={x+w/2} y={y+h/2-2} textAnchor="middle" fontSize="11" fill={color} fontFamily="ui-serif, Georgia, serif" fontStyle="italic">{title}</text>
+      {subtitle && <text x={x+w/2} y={y+h/2+11} textAnchor="middle" fontSize="7.5" fill={color} fontFamily="ui-serif, Georgia, serif" opacity="0.8">{subtitle}</text>}
+    </g>
+  );
+}
+
+function Label({ x, y, children, size=8.5, color=INK, italic=true, anchor="middle", opacity=0.85, rotate=0 }) {
+  return (
+    <text x={x} y={y} textAnchor={anchor} fontSize={size} fill={color}
+      fontFamily="ui-serif, Georgia, serif" fontStyle={italic?"italic":"normal"}
+      opacity={opacity} transform={rotate?`rotate(${rotate} ${x} ${y})`:undefined}>{children}</text>
+  );
+}
+
+function HeroBeirut1900({ className="" }) {
+  const hatch=useId();
+  const coast="M 0,295 C 80,300 140,260 220,275 S 360,300 460,270 S 600,250 700,260 L 760,260 L 760,300 L 830,300 L 830,255 L 900,250 C 1010,245 1110,260 1200,255";
+  const seaShape=coast+" L 1200,0 L 0,0 Z";
+  return (
+    <svg className={className} viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Plan of Beirut, 1900">
+      <HatchDefs idHatch={hatch} idStipple={useId()} color={INDIGO} density={8}/>
+      <rect width="1200" height="640" fill={PARCH}/>
+      <path d={seaShape} fill={`url(#${hatch})`}/>
+      <path d={seaShape} fill={INDIGO} opacity="0.07"/>
+      <path d={coast} fill="none" stroke={INK} strokeWidth="1" opacity="0.85"/>
+      <g fill="none" stroke={INDIGO} strokeWidth="0.4" opacity="0.45">
+        <path d="M 0,250 C 200,260 420,235 700,225 S 1100,215 1200,225"/>
+        <path d="M 0,200 C 220,210 460,180 740,170 S 1100,160 1200,170"/>
+        <path d="M 0,140 C 240,150 500,120 800,108 S 1120,100 1200,110"/>
+      </g>
+      <g opacity="0.5">
+        <path d="M 60,360 L 320,355 L 360,420 L 220,490 L 90,440 Z" fill={GREY} opacity="0.16"/>
+        <path d="M 360,420 L 560,400 L 600,500 L 420,530 L 360,470 Z" fill={GREY} opacity="0.10"/>
+        <path d="M 600,500 L 820,470 L 880,560 L 660,600 Z" fill={GREY} opacity="0.16"/>
+      </g>
+      <g stroke={INK} strokeWidth="0.7" opacity="0.78" fill="none">
+        <path d="M 30,330 C 200,335 380,310 560,305 S 880,310 1180,300" strokeWidth="1.1"/>
+        <path d="M 200,330 L 280,540"/><path d="M 280,322 L 320,560"/><path d="M 360,315 L 380,580"/>
+        <path d="M 440,310 L 480,600"/><path d="M 520,308 L 560,610"/><path d="M 620,308 L 640,620"/>
+        <path d="M 700,305 L 720,620"/><path d="M 780,310 L 820,620"/><path d="M 860,300 L 900,620"/>
+        <path d="M 940,295 L 980,620"/><path d="M 1040,295 L 1080,620"/>
+        <path d="M 80,400 C 280,395 480,388 700,388 S 1080,390 1180,388"/>
+        <path d="M 90,470 C 300,465 520,460 740,462 S 1080,470 1180,468"/>
+        <path d="M 100,540 C 320,535 560,530 800,540 S 1080,560 1180,560"/>
+        <path d="M 120,610 C 340,605 600,608 880,612 S 1100,620 1180,620"/>
+        <path d="M 360,330 L 700,620" strokeWidth="0.9"/>
+        <path d="M 1080,300 L 700,620" strokeWidth="0.9"/>
+      </g>
+      <g stroke={RUST} fill="none" opacity="0.7">
+        <path d="M 40,343 C 220,348 400,322 580,318 S 880,322 1180,312" strokeWidth="0.55" strokeDasharray="5 3"/>
+      </g>
+      <g fill={INK} opacity="0.7">
+        <rect x="760" y="270" width="6" height="32"/><rect x="780" y="280" width="44" height="6"/>
+        <rect x="828" y="262" width="6" height="42"/><rect x="780" y="295" width="44" height="3"/>
+      </g>
+      <g fill={INK} opacity="0.55">
+        {[0,1,2,3,4].map(i=><rect key={i} x={770+i*12} y={258} width="3" height="8"/>)}
+        {[0,1,2].map(i=><rect key={i} x={835+i*10} y={245} width="3" height="6"/>)}
+      </g>
+      <g fill={INK} opacity="0.62">
+        <rect x="468" y="386" width="9" height="9"/>
+        <rect x="586" y="394" width="7" height="7" transform="rotate(45 590 397)"/>
+        <rect x="700" y="402" width="6" height="6"/>
+        <rect x="822" y="430" width="8" height="8"/>
+        <circle cx="370" cy="430" r="3.5"/>
+        <rect x="280" y="430" width="6" height="6"/>
+      </g>
+      <g fill={INK}>
+        <Label x={140} y={140} size={10} color={INDIGO}>Mer Méditerranée</Label>
+        <Label x={140} y={154} size={8} color={INDIGO} opacity={0.7}>البحر الأبيض المتوسّط</Label>
+        <Label x={260} y={420}>Ras Beyrouth</Label>
+        <Label x={420} y={440}>Hamra</Label>
+        <Label x={520} y={395}>Bab Idriss</Label>
+        <Label x={620} y={420}>Place des Canons</Label>
+        <Label x={760} y={420}>Saïfi</Label>
+        <Label x={900} y={460}>Achrafieh</Label>
+        <Label x={830} y={335} color={RUST}>Port de Beyrouth</Label>
+        <Label x={140} y={345} size={8} color={RUST} opacity={0.75}>Tramway de Beyrouth</Label>
+        <Label x={690} y={580} size={8} color={GREY}>Route de Damas</Label>
+      </g>
+      <Cartouche x={36} y={530} w={210} h={70} title="Plan de Beyrouth" subtitle="dressé en MCM, par J. Löytved"/>
+      <CompassRose cx={1130} cy={510} r={14}/>
+      <g transform="translate(960,600)">
+        <line x1="0" y1="0" x2="120" y2="0" stroke={INK} strokeWidth="0.7"/>
+        {[0,30,60,90,120].map(x=><line key={x} x1={x} y1="-3" x2={x} y2="3" stroke={INK} strokeWidth="0.5"/>)}
+        <text x="0" y="14" fontSize="6.5" fill={INK} fontFamily="ui-serif, Georgia, serif">0</text>
+        <text x="120" y="14" fontSize="6.5" fill={INK} fontFamily="ui-serif, Georgia, serif" textAnchor="end">1 km</text>
+      </g>
+      <PlateFrame w={1200} h={640} pad={10}/>
+    </svg>
+  );
+}
+
+function BeirutLayered({ mode="1900" }) {
+  const hatchOld=useId(), hatchNew=useId();
+  const coastOld="M 0,250 C 90,255 170,220 260,235 S 420,260 540,230 S 700,210 780,220 L 840,220 L 840,265 L 920,265 L 920,210 C 1020,200 1110,225 1200,220";
+  const coastNew="M 0,265 C 90,260 180,238 280,250 S 460,275 600,255 S 780,250 880,260 L 1010,260 L 1015,210 C 1090,215 1160,235 1200,230";
+  const Plate1900=(
+    <g>
+      <path d={coastOld+" L 1200,0 L 0,0 Z"} fill={`url(#${hatchOld})`}/>
+      <path d={coastOld+" L 1200,0 L 0,0 Z"} fill={INDIGO} opacity="0.06"/>
+      <path d={coastOld} fill="none" stroke={INDIGO} strokeWidth="1"/>
+      <g stroke={INDIGO} strokeWidth="0.55" opacity="0.85" fill="none">
+        <path d="M 30,290 C 220,295 460,275 700,275 S 1080,285 1180,278" strokeWidth="0.9"/>
+        {Array.from({length:12}).map((_,i)=><path key={i} d={`M ${80+i*95},${275+(i%2)*4} L ${110+i*95},${440}`}/>)}
+        <path d="M 80,360 C 280,355 520,350 740,358 S 1080,370 1180,362"/>
+        <path d="M 100,420 C 320,418 600,420 880,430 S 1100,440 1180,438"/>
+        <path d="M 360,290 L 700,460" strokeWidth="0.75"/>
+        <path d="M 1080,278 L 700,460" strokeWidth="0.75"/>
+      </g>
+      <g stroke={INDIGO} fill="none" opacity="0.95">
+        <path d="M 40,303 C 220,308 400,288 580,283 S 880,288 1180,278" strokeWidth="0.5" strokeDasharray="5 3"/>
+        <path d="M 200,310 L 420,460" strokeWidth="0.5" strokeDasharray="5 3"/>
+      </g>
+      <g fill={INDIGO} opacity="0.85">
+        <rect x="840" y="230" width="5" height="36"/><rect x="855" y="240" width="58" height="4"/><rect x="915" y="225" width="5" height="44"/>
+      </g>
+      <g fill={INDIGO} opacity="0.85">
+        <rect x="556" y="338" width="7" height="7"/>
+        <rect x="618" y="350" width="6" height="6" transform="rotate(45 621 353)"/>
+        <rect x="700" y="358" width="5" height="5"/>
+      </g>
+      <g fill={INDIGO}>
+        <Label x={620} y={345} color={INDIGO}>Place des Canons</Label>
+        <Label x={900} y={310} color={INDIGO}>Port franc</Label>
+        <Label x={420} y={415} size={8} color={INDIGO} opacity={0.8}>Tramway</Label>
+        <Label x={150} y={130} size={9.5} color={INDIGO}>Mer Méditerranée</Label>
+      </g>
+    </g>
+  );
+  const PlateToday=(
+    <g>
+      <path d={coastNew+" L 1200,0 L 0,0 Z"} fill={`url(#${hatchNew})`}/>
+      <path d={coastNew+" L 1200,0 L 0,0 Z"} fill={RUST} opacity="0.05"/>
+      <path d={coastNew} fill="none" stroke={RUST} strokeWidth="1"/>
+      <path d="M 0,278 C 200,282 460,260 700,260 S 1000,270 1200,260" stroke={RUST} strokeWidth="1.2" fill="none" opacity="0.9"/>
+      <path d="M 0,470 L 1200,330" stroke={RUST} strokeWidth="1.8" fill="none" opacity="0.7"/>
+      <path d="M 0,478 L 1200,338" stroke={RUST} strokeWidth="0.4" fill="none" opacity="0.6"/>
+      <g stroke={RUST} strokeWidth="0.55" opacity="0.85" fill="none">
+        {Array.from({length:10}).map((_,i)=><line key={"v"+i} x1={500+i*40} y1={300} x2={500+i*40} y2={440}/>)}
+        {Array.from({length:4}).map((_,i)=><line key={"h"+i} x1={500} y1={310+i*32} x2={900} y2={310+i*32}/>)}
+      </g>
+      <g fill={RUST} opacity="0.85">
+        <rect x="1015" y="215" width="6" height="46"/><rect x="1035" y="225" width="80" height="5"/>
+        <rect x="1115" y="200" width="6" height="62"/><rect x="950" y="265" width="170" height="4"/>
+      </g>
+      <rect x="612" y="345" width="22" height="10" fill="none" stroke={RUST} strokeWidth="0.7" opacity="0.95"/>
+      <rect x="700" y="318" width="44" height="32" fill="none" stroke={RUST} strokeWidth="0.55" opacity="0.85"/>
+      <g stroke={RUST} strokeWidth="0.4" opacity="0.7" fill="none">
+        {Array.from({length:14}).map((_,i)=><line key={"r"+i} x1={60+i*70} y1={290} x2={70+i*70} y2={480}/>)}
+        <path d="M 60,400 C 320,400 600,408 880,418 S 1100,428 1180,425"/>
+      </g>
+      <g fill={RUST}>
+        <Label x={620} y={335} color={RUST}>Martyrs’ Sq.</Label>
+        <Label x={1050} y={305} color={RUST}>Port of Beirut</Label>
+        <Label x={150} y={300} color={RUST}>Corniche</Label>
+        <Label x={300} y={420} color={RUST}>Ring road</Label>
+        <Label x={150} y={130} size={9.5} color={RUST}>Mediterranean Sea</Label>
+      </g>
+    </g>
+  );
+  return (
+    <svg viewBox="0 0 1200 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label={`Beirut, ${mode}`}>
+      <HatchDefs idHatch={hatchOld} idStipple={useId()} color={INDIGO} density={9}/>
+      <HatchDefs idHatch={hatchNew} idStipple={useId()} color={RUST} density={9}/>
+      <rect width="1200" height="540" fill={PARCH}/>
+      <line x1="44" y1="50" x2="1156" y2="50" stroke={INK} strokeWidth="0.4" opacity="0.7"/>
+      {mode==="1900" && <g>{Plate1900}</g>}
+      {mode==="today" && <g>{PlateToday}</g>}
+      {mode==="overlay" && <g><g opacity="0.65">{Plate1900}</g><g opacity="0.65">{PlateToday}</g></g>}
+      <PlateFrame w={1200} h={540} pad={10}/>
+      <Cartouche x={44} y={20} w={260} h={28} title={mode==="1900"?"Beyrouth, 1900":mode==="today"?"Beyrouth, 2024":"Beyrouth — 1900 ⁄ 2024"}/>
+      <CompassRose cx={1130} cy={490} r={12}/>
+    </svg>
+  );
+}
+
+function CollectionThumb({ kind }) {
+  const hatch=useId();
+  return (
+    <svg viewBox="0 0 240 180" className="w-full h-auto block">
+      <HatchDefs idHatch={hatch} idStipple={useId()} color={INDIGO} density={6}/>
+      <rect width="240" height="180" fill={PARCH}/>
+      <PlateFrame w={240} h={180} pad={6} ticks={false}/>
+      {kind==="damascus" && <DamascusGlyph/>}
+      {kind==="jerusalem" && <JerusalemGlyph/>}
+      {kind==="aleppo" && <AleppoGlyph/>}
+      {kind==="jaffa" && <JaffaGlyph hatch={hatch}/>}
+    </svg>
+  );
+}
+
+function DamascusGlyph() {
+  const cx=120, cy=92;
+  const gates=Array.from({length:7}).map((_,i)=>{
+    const a=(i/7)*Math.PI*2 - Math.PI/2;
+    return { x: cx+Math.cos(a)*64, y: cy+Math.sin(a)*36 };
+  });
+  return (
+    <g>
+      <ellipse cx={cx} cy={cy} rx="66" ry="38" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <ellipse cx={cx} cy={cy} rx="60" ry="33" fill="none" stroke={INK} strokeWidth="0.35"/>
+      <line x1={cx-58} y1={cy+4} x2={cx+58} y2={cy+4} stroke={INK} strokeWidth="0.8"/>
+      <g stroke={INK} strokeWidth="0.4" opacity="0.7">
+        {Array.from({length:11}).map((_,i)=>{
+          const x=cx-56+i*11;
+          return <line key={i} x1={x} y1={cy-30} x2={x+(i-5)*1.2} y2={cy+28}/>;
+        })}
+        <path d="M 60,82 C 110,82 150,82 180,82"/>
+        <path d="M 64,102 C 120,102 160,102 178,102"/>
+      </g>
+      <g fill={INK}>{gates.map((g,i)=><circle key={i} cx={g.x} cy={g.y} r="1.4"/>)}</g>
+      <rect x={cx+8} y={cy-12} width="14" height="9" fill={INK} opacity="0.75"/>
+      <Label x={cx} y={36} size={9.5} italic={false}>Dimashq</Label>
+      <Label x={cx} y={48} size={7.5} color={GREY}>المدينة المُسوَّرة</Label>
+      <Label x={cx} y={158} size={7} color={GREY}>1860 — 1932</Label>
+    </g>
+  );
+}
+
+function JerusalemGlyph() {
+  return (
+    <g>
+      <path d="M 60,52 L 184,46 L 188,138 L 56,142 Z" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <path d="M 64,56 L 180,50 L 184,134 L 60,138 Z" fill="none" stroke={INK} strokeWidth="0.35"/>
+      <line x1="122" y1="48" x2="120" y2="140" stroke={INK} strokeWidth="0.7"/>
+      <line x1="58" y1="94" x2="186" y2="92" stroke={INK} strokeWidth="0.7"/>
+      <g transform="translate(150 110)"><polygon points="0,-8 6,-5 8,2 5,8 -3,9 -8,4 -8,-3 -3,-8" fill={INK} opacity="0.85"/></g>
+      <g transform="translate(92 80)" stroke={INK} strokeWidth="0.8">
+        <line x1="-4" y1="0" x2="4" y2="0"/><line x1="0" y1="-4" x2="0" y2="4"/>
+      </g>
+      <rect x="60" y="116" width="5" height="6" fill={INK} opacity="0.85"/>
+      <g stroke={INK} strokeWidth="0.3" opacity="0.6">
+        {Array.from({length:10}).map((_,i)=><line key={"v"+i} x1={68+i*12} y1={56} x2={68+i*12} y2={138}/>)}
+        {Array.from({length:6}).map((_,i)=><line key={"h"+i} x1={60} y1={62+i*14} x2={186} y2={62+i*14}/>)}
+      </g>
+      <Label x={120} y={36} size={9.5} italic={false}>al-Quds</Label>
+      <Label x={120} y={158} size={7} color={GREY}>الأرباع الأربعة، ١٨٨٣</Label>
+    </g>
+  );
+}
+
+function AleppoGlyph() {
+  const cx=120, cy=96;
+  return (
+    <g>
+      <path d="M 50,72 L 90,46 L 168,50 L 196,86 L 192,128 L 144,148 L 70,142 L 44,108 Z" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <circle cx={cx} cy={cy} r="20" fill={INK} opacity="0.12"/>
+      <circle cx={cx} cy={cy} r="20" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <circle cx={cx} cy={cy} r="14" fill="none" stroke={INK} strokeWidth="0.4"/>
+      <line x1={cx-20} y1={cy} x2={cx-32} y2={cy} stroke={INK} strokeWidth="0.8"/>
+      <g stroke={INK} strokeWidth="0.4" opacity="0.75" fill="none">
+        {Array.from({length:14}).map((_,i)=>{
+          const a=(i/14)*Math.PI*2, r1=22, r2=56;
+          return <line key={i} x1={cx+Math.cos(a)*r1} y1={cy+Math.sin(a)*r1} x2={cx+Math.cos(a)*r2} y2={cy+Math.sin(a)*r2}/>;
+        })}
+        <circle cx={cx} cy={cy} r="38"/>
+        <circle cx={cx} cy={cy} r="50"/>
+      </g>
+      <line x1={cx} y1={cy} x2="200" y2="34" stroke={INK} strokeWidth="0.6" strokeDasharray="3 2"/>
+      <Label x={205} y={32} size={7} color={GREY} anchor="end">→ Konya</Label>
+      <Label x={120} y={36} size={9.5} italic={false}>Halab</Label>
+      <Label x={120} y={158} size={7} color={GREY}>القلعة والأسواق</Label>
+    </g>
+  );
+}
+
+function JaffaGlyph({ hatch }) {
+  return (
+    <g>
+      <path d="M 0,0 L 0,180 L 80,180 C 70,150 76,120 86,96 C 96,72 110,52 130,40 L 130,0 Z" fill={`url(#${hatch})`}/>
+      <path d="M 80,180 C 70,150 76,120 86,96 C 96,72 110,52 130,40" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <g fill="none" stroke={INK}>
+        <path d="M 96,86 C 112,76 130,76 144,84 C 150,94 148,108 138,116 C 124,124 108,122 100,114 C 92,104 92,94 96,86 Z" strokeWidth="0.9"/>
+        <path d="M 102,92 C 116,84 132,84 142,92 C 146,100 144,108 136,114 C 124,120 110,118 104,112 C 98,104 98,96 102,92 Z" strokeWidth="0.35"/>
+      </g>
+      <rect x="138" y="76" width="4" height="10" fill={INK}/>
+      <g fill={INK} opacity="0.55">
+        {Array.from({length:6}).map((_,r)=>(
+          Array.from({length:8}).map((_,c)=>(<circle key={r+"-"+c} cx={140+c*10} cy={110+r*9} r="0.9"/>))
+        ))}
+      </g>
+      <line x1="120" y1="118" x2="232" y2="160" stroke={INK} strokeWidth="0.6" strokeDasharray="3 2"/>
+      <Label x={228} y={156} size={7} color={GREY} anchor="end">→ al-Quds</Label>
+      <Label x={120} y={36} size={9.5} italic={false}>Yāfā</Label>
+      <Label x={120} y={158} size={7} color={GREY}>الميناء والبساتين</Label>
+    </g>
+  );
+}
+
+function ArchiveMap({ kind }) {
+  const hatch=useId();
+  return (
+    <svg viewBox="0 0 280 200" className="block w-full h-auto">
+      <HatchDefs idHatch={hatch} idStipple={useId()} color={INDIGO} density={6}/>
+      <rect width="280" height="200" fill={PARCH}/>
+      <PlateFrame w={280} h={200} pad={7} ticks={false}/>
+      {kind==="walled"    && <WalledCity/>}
+      {kind==="oldcity"   && <OldCityGlyph/>}
+      {kind==="citadel"   && <CitadelGlyph/>}
+      {kind==="coastgrid" && <CoastGrid hatch={hatch}/>}
+      {kind==="peninsula" && <PeninsulaGlyph hatch={hatch}/>}
+      {kind==="twincity"  && <TwinCity hatch={hatch}/>}
+      {kind==="river"     && <RiverCity hatch={hatch}/>}
+      {kind==="bay"       && <BayCity hatch={hatch}/>}
+    </svg>
+  );
+}
+
+function WalledCity() {
+  return (
+    <g>
+      <path d="M 70,60 L 210,52 L 224,148 L 64,156 Z" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <line x1="68" y1="100" x2="224" y2="100" stroke={INK} strokeWidth="0.7"/>
+      <g stroke={INK} strokeWidth="0.35" opacity="0.7">
+        {Array.from({length:10}).map((_,i)=><line key={i} x1={80+i*15} y1={56} x2={80+i*15} y2={152}/>)}
+      </g>
+      <rect x="140" y="92" width="18" height="14" fill={INK} opacity="0.5"/>
+    </g>
+  );
+}
+
+function OldCityGlyph() {
+  return (
+    <g>
+      <rect x="68" y="50" width="148" height="108" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <line x1="142" y1="50" x2="142" y2="158" stroke={INK} strokeWidth="0.7"/>
+      <line x1="68" y1="104" x2="216" y2="104" stroke={INK} strokeWidth="0.7"/>
+      <polygon points="174,128 180,124 184,131 181,138 173,138 168,131" fill={INK} opacity="0.85"/>
+      <g stroke={INK} strokeWidth="0.3" opacity="0.55">
+        {Array.from({length:8}).map((_,i)=><line key={"v"+i} x1={78+i*16} y1={54} x2={78+i*16} y2={156}/>)}
+      </g>
+    </g>
+  );
+}
+
+function CitadelGlyph() {
+  return (
+    <g>
+      <path d="M 50,72 L 90,52 L 200,54 L 230,84 L 226,140 L 168,158 L 78,150 L 46,118 Z" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <circle cx="140" cy="104" r="22" fill={INK} opacity="0.12"/>
+      <circle cx="140" cy="104" r="22" fill="none" stroke={INK} strokeWidth="0.9"/>
+      <g stroke={INK} strokeWidth="0.35" opacity="0.7" fill="none">
+        {Array.from({length:12}).map((_,i)=>{
+          const a=(i/12)*Math.PI*2;
+          return <line key={i} x1={140+Math.cos(a)*24} y1={104+Math.sin(a)*24} x2={140+Math.cos(a)*58} y2={104+Math.sin(a)*58}/>;
+        })}
+        <circle cx="140" cy="104" r="42"/>
+      </g>
+    </g>
+  );
+}
+
+function CoastGrid({ hatch }) {
+  return (
+    <g>
+      <path d="M 14,14 L 80,14 C 90,60 110,100 138,130 C 168,160 200,176 264,184 L 264,14 Z" fill={`url(#${hatch})`} opacity="0.6"/>
+      <path d="M 80,14 C 90,60 110,100 138,130 C 168,160 200,176 264,184" fill="none" stroke={INDIGO} strokeWidth="0.8"/>
+      <g stroke={INK} strokeWidth="0.35" opacity="0.7">
+        {Array.from({length:8}).map((_,i)=><line key={"v"+i} x1={100+i*20} y1={50} x2={120+i*20} y2={185}/>)}
+        {Array.from({length:4}).map((_,i)=><line key={"h"+i} x1={90} y1={70+i*30} x2={264} y2={80+i*30}/>)}
+      </g>
+      <g fill={INK} opacity="0.55">
+        {Array.from({length:5}).map((_,r)=>(
+          Array.from({length:7}).map((_,c)=>(<circle key={r+"-"+c} cx={140+c*16} cy={70+r*22} r="0.9"/>))
+        ))}
+      </g>
+    </g>
+  );
+}
+
+function PeninsulaGlyph({ hatch }) {
+  return (
+    <g>
+      <path d="M 0,0 L 280,0 L 280,80 C 240,75 200,70 160,75 C 130,80 100,72 60,82 L 0,90 Z" fill={`url(#${hatch})`} opacity="0.6"/>
+      <path d="M 280,80 C 240,75 200,70 160,75 C 130,80 100,72 60,82 L 0,90" fill="none" stroke={INDIGO} strokeWidth="0.9"/>
+      <g stroke={INK} strokeWidth="0.4" opacity="0.75">
+        <path d="M 12,100 C 110,98 200,98 270,100"/>
+        <path d="M 16,130 C 110,128 200,130 270,134"/>
+        <path d="M 20,160 C 110,158 200,160 270,166"/>
+        {Array.from({length:8}).map((_,i)=><line key={i} x1={40+i*30} y1={90} x2={50+i*30} y2={180}/>)}
+      </g>
+      <rect x="220" y="70" width="8" height="14" fill={INK} opacity="0.7"/>
+    </g>
+  );
+}
+
+function TwinCity({ hatch }) {
+  return (
+    <g>
+      <path d="M 0,40 L 60,38 C 90,38 110,55 120,75 C 130,95 150,108 180,108 L 280,108 L 280,0 L 0,0 Z" fill={`url(#${hatch})`} opacity="0.55"/>
+      <path d="M 0,40 L 60,38 C 90,38 110,55 120,75 C 130,95 150,108 180,108 L 280,108" fill="none" stroke={INDIGO} strokeWidth="0.9"/>
+      <g fill="none" stroke={INK}>
+        <rect x="40" y="50" width="40" height="30"/>
+        <rect x="180" y="120" width="60" height="50"/>
+        <line x1="80" y1="62" x2="180" y2="138" strokeDasharray="3 2" strokeWidth="0.6"/>
+      </g>
+      <g stroke={INK} strokeWidth="0.35" opacity="0.7">
+        {Array.from({length:4}).map((_,i)=><line key={i} x1={188+i*12} y1={124} x2={188+i*12} y2={166}/>)}
+      </g>
+    </g>
+  );
+}
+
+function RiverCity({ hatch }) {
+  return (
+    <g>
+      <path d="M 0,80 C 80,90 120,110 160,108 C 200,106 240,90 280,98 L 280,128 C 240,118 200,134 160,138 C 120,142 80,118 0,110 Z" fill={`url(#${hatch})`} opacity="0.6"/>
+      <path d="M 0,80 C 80,90 120,110 160,108 C 200,106 240,90 280,98" fill="none" stroke={INDIGO} strokeWidth="0.8"/>
+      <path d="M 0,110 C 80,118 120,142 160,138 C 200,134 240,118 280,128" fill="none" stroke={INDIGO} strokeWidth="0.8"/>
+      <g stroke={INK} strokeWidth="0.4" opacity="0.8" fill="none">
+        {Array.from({length:8}).map((_,i)=><rect key={"a"+i} x={30+i*30} y={36} width="20" height="36"/>)}
+        {Array.from({length:8}).map((_,i)=><rect key={"b"+i} x={30+i*30} y={150} width="20" height="36"/>)}
+      </g>
+      <rect x="124" y="100" width="32" height="20" fill="none" stroke={INK} strokeWidth="0.8"/>
+    </g>
+  );
+}
+
+function BayCity({ hatch }) {
+  return (
+    <g>
+      <path d="M 280,0 L 0,0 L 0,60 C 60,80 90,100 110,120 C 130,140 170,156 280,150 Z" fill={`url(#${hatch})`} opacity="0.6"/>
+      <path d="M 0,60 C 60,80 90,100 110,120 C 130,140 170,156 280,150" fill="none" stroke={INDIGO} strokeWidth="0.9"/>
+      <g fill="none" stroke={INK} strokeWidth="0.4" opacity="0.7">
+        <path d="M 50,180 C 90,160 130,168 180,180"/>
+        <path d="M 30,190 C 90,168 150,180 230,196"/>
+      </g>
+      <g fill={INK} opacity="0.85">
+        <rect x="200" y="135" width="6" height="22"/>
+        <rect x="215" y="142" width="50" height="4"/>
+        <rect x="262" y="128" width="6" height="28"/>
+      </g>
+    </g>
+  );
+}
+
+// ================== APP ==================
+const C = window.LEVANT_CONTENT;
+const isAr = (lang) => lang === "ar";
+
+function Pill({ children, className="" }) {
+  return <span className={`num inline-flex items-center justify-center text-[10px] leading-none px-1.5 py-1 rounded-sm border border-ink/40 text-ink/80 ${className}`}>{children}</span>;
+}
+
+function GhostBtn({ children, onClick, className="" }) {
+  return (
+    <button onClick={onClick} className={`group inline-flex items-center gap-3 px-6 py-3 border border-ink/70 text-ink hover:bg-ink hover:text-parchment font-serif text-[15px] tracking-wide transition-colors duration-300 ${className}`}>
+      <span>{children}</span>
+      <span aria-hidden className="inline-block w-6 h-px bg-current opacity-70 group-hover:w-10 transition-all duration-300"></span>
+    </button>
+  );
+}
+
+function SectionRule({ label, lang }) {
+  return (
+    <div className={`flex items-center gap-4 ${isAr(lang)?"flex-row-reverse":""}`}>
+      <div className="flex-1 h-px bg-ink/25"></div>
+      <span className="smallcaps text-warmgrey text-[11px]">{label}</span>
+      <div className="flex-1 h-px bg-ink/25"></div>
+    </div>
+  );
+}
+
+function Header({ lang, setLang, cartCount, justAdded }) {
+  const n=C.nav[lang];
+  const langs=["en","ar","fr"];
+  return (
+    <header className="relative z-20 border-b border-ink/15 bg-parchment/90 backdrop-blur-[1px]">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10 py-5 md:py-6 flex items-center gap-6">
+        <a href="#top" className="flex items-baseline gap-2 me-auto select-none">
+          <span className="font-serif text-ink text-[18px] md:text-[20px] tracking-wide">{C.brand[lang]}</span>
+          <span className="hidden md:inline font-serif italic text-warmgrey text-[12px]">{C.tagline[lang]}</span>
+        </a>
+        <nav className="hidden md:flex items-center gap-6 font-serif text-[14.5px] text-ink">
+          <a href="#collections" className="hover:text-rust transition-colors">{n.collections}</a>
+          <a href="#archive" className="hover:text-rust transition-colors">{n.archive}</a>
+          <a href="#about" className="hover:text-rust transition-colors">{n.about}</a>
+          <a href="#archive" className="relative inline-flex items-center gap-2 hover:text-rust transition-colors">
+            <span>{n.cart}</span>
+            <span className="num inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10.5px] border border-ink/55 text-ink/80 leading-none">{cartCount}</span>
+            <span aria-live="polite" className={`absolute -bottom-5 ${isAr(lang)?"right-0":"left-0"} text-[10.5px] italic text-rust transition-opacity duration-500 ${justAdded?"opacity-100":"opacity-0"}`}>
+              {lang==="en"?"added to cart":lang==="ar"?"أُضيف إلى السلّة":"ajouté au panier"}
+            </span>
+          </a>
+        </nav>
+        <div className="flex items-center text-[13px] font-serif border border-ink/30">
+          {langs.map((L,i)=>(
+            <button key={L} onClick={()=>setLang(L)} className={`px-2.5 py-1.5 ${i>0?"border-l border-ink/25":""} ${lang===L?"bg-ink text-parchment":"text-ink hover:bg-ink/10"} transition-colors`}>{C.langLabel[L]}</button>
+          ))}
+        </div>
+      </div>
+      <div className="md:hidden border-t border-ink/15">
+        <div className="max-w-[1280px] mx-auto px-5 py-2.5 flex items-center justify-between font-serif text-[13.5px] text-ink">
+          <a href="#collections">{n.collections}</a>
+          <a href="#archive">{n.archive}</a>
+          <a href="#about">{n.about}</a>
+          <a href="#archive" className="inline-flex items-center gap-1.5">{n.cart} <Pill>{cartCount}</Pill></a>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Hero({ lang }) {
+  const h=C.hero[lang];
+  return (
+    <section id="top" className="relative w-full" style={{height:"min(78vh, 820px)"}}>
+      <div className="absolute inset-0"><HeroBeirut1900 className="w-full h-full"/></div>
+      <div className="absolute inset-0 pointer-events-none" style={{background:"radial-gradient(60% 50% at 50% 65%, rgba(244,238,228,0.0) 0%, rgba(244,238,228,0.45) 60%, rgba(244,238,228,0.9) 100%)"}}></div>
+      <div className="absolute inset-0 flex flex-col items-center justify-end pb-[8vh] md:pb-[10vh] px-6 text-center">
+        <div className="plate-in">
+          <h1 className="font-serif text-ink text-[44px] md:text-[78px] leading-[1.05] tracking-tight">{h.title}</h1>
+          <p className="mt-3 font-serif italic text-ink/85 text-[16px] md:text-[20px]">{h.sub}</p>
+          <div className="mt-7 flex justify-center"><a href="#archive"><GhostBtn>{h.cta}</GhostBtn></a></div>
+        </div>
+      </div>
+      <div className="absolute top-3 left-4 md:left-6 font-serif italic text-ink/65 text-[11px] md:text-[12px]">{lang==="ar"?"اللوحة الأولى":lang==="fr"?"Planche I":"Plate I"}</div>
+      <div className="absolute top-3 right-4 md:right-6 font-serif italic text-ink/65 text-[11px] md:text-[12px]">{lang==="ar"?"إصدارات المشرق":"Mashriq Editions"}</div>
+    </section>
+  );
+}
+
+function Editorial({ lang }) {
+  const paras=C.intro[lang];
+  return (
+    <section id="about" className="relative">
+      <div className="max-w-[760px] mx-auto px-6 md:px-8 py-20 md:py-28 lede">
+        <p className="smallcaps text-warmgrey text-[11px] mb-6 text-center">{lang==="en"?"From the press":lang==="ar"?"من الدار":"De la maison"}</p>
+        <div className="space-y-5 font-serif text-ink text-[19px] md:text-[21px]" style={{textAlign:isAr(lang)?"right":"left"}}>
+          {paras.map((p,i)=><p key={i}>{p}</p>)}
+        </div>
+        <div className="mt-10 flex items-center justify-center"><div className="w-12 h-px bg-ink/40"></div></div>
+      </div>
+    </section>
+  );
+}
+
+function Collections({ lang }) {
+  const [hover,setHover]=useState(null);
+  return (
+    <section id="collections" className="relative border-y border-ink/15 bg-parchdeep/50">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10 py-16 md:py-20">
+        <div className="mb-10 md:mb-14">
+          <SectionRule label={lang==="en"?"Four collections":lang==="ar"?"أربع مجموعات":"Quatre collections"} lang={lang}/>
+          <h2 className="mt-6 font-serif text-ink text-[28px] md:text-[36px]" style={{textAlign:isAr(lang)?"right":"left"}}>{C.collectionsHeading[lang]}</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 border-t border-ink/20 border-s border-ink/20">
+          {C.collections.map((col)=>{
+            const active=hover===col.id;
+            return (
+              <div key={col.id} onMouseEnter={()=>setHover(col.id)} onMouseLeave={()=>setHover(null)}
+                className={`group relative border-b border-e border-ink/20 p-5 md:p-6 transition-colors duration-300 ${active?"bg-parchment":"bg-transparent"}`}>
+                <div className="aspect-[4/3] bg-parchment border border-ink/20 overflow-hidden"><CollectionThumb kind={col.id}/></div>
+                <div className="mt-5 flex items-baseline justify-between gap-3" dir={isAr(lang)?"rtl":"ltr"}>
+                  <h3 className="font-serif text-ink text-[20px] md:text-[22px]">{col.name[lang]}</h3>
+                  <span className="num text-[11px] text-warmgrey">{col.count} {lang==="en"?"plates":lang==="ar"?"لوحة":"planches"}</span>
+                </div>
+                <p className={`mt-2 font-serif italic text-ink/70 text-[14px] leading-[1.55] transition-opacity duration-500 ${active?"opacity-100":"opacity-70"}`} style={{textAlign:isAr(lang)?"right":"left"}}>{col.desc[lang]}</p>
+                <div className={`mt-4 h-px bg-ink transition-all duration-500 ${active?"w-12 opacity-80":"w-6 opacity-40"}`}></div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Featured({ lang }) {
+  const [mode,setMode]=useState("1900");
+  const f=C.featured, labels=f.layers[lang], leg=f.legend[lang];
+  const tabs=[{id:"1900",label:labels.y1900},{id:"today",label:labels.today},{id:"overlay",label:labels.overlay}];
+  return (
+    <section className="relative">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10 py-20 md:py-28">
+        <div className="mb-8">
+          <SectionRule label={lang==="en"?"Featured plate":lang==="ar"?"لوحة مختارة":"Planche en vedette"} lang={lang}/>
+          <div className={`mt-6 flex flex-col md:flex-row md:items-end md:justify-between gap-3 ${isAr(lang)?"md:flex-row-reverse":""}`}>
+            <h2 className="font-serif text-ink text-[28px] md:text-[40px]" style={{textAlign:isAr(lang)?"right":"left"}}>{f.heading[lang]}</h2>
+            <p className="font-serif italic text-warmgrey text-[14.5px] max-w-md" style={{textAlign:isAr(lang)?"right":"left"}}>{f.note[lang]}</p>
+          </div>
+        </div>
+        <div className={`flex ${isAr(lang)?"justify-end":"justify-start"} mb-5`}>
+          <div className="inline-flex border border-ink/35">
+            {tabs.map((t,i)=>(
+              <button key={t.id} onClick={()=>setMode(t.id)} className={`px-4 md:px-5 py-2 font-serif text-[13.5px] ${i>0?"border-s border-ink/30":""} ${mode===t.id?"bg-ink text-parchment":"text-ink hover:bg-ink/10"} transition-colors`}>{t.label}</button>
+            ))}
+          </div>
+        </div>
+        <div className="relative">
+          <div className="border border-ink/30 bg-parchment p-2 md:p-3">
+            <div className="border border-ink/20 bg-parchment p-1.5 md:p-2">
+              <div className="relative"><BeirutLayered mode={mode}/></div>
+            </div>
+          </div>
+          <div className={`mt-5 flex flex-wrap items-center gap-5 ${isAr(lang)?"justify-end":"justify-start"} font-serif text-[12.5px]`}>
+            <span className="inline-flex items-center gap-2"><span className="w-5 h-px bg-indigo"></span><span className="italic text-indigo">{leg.old}</span></span>
+            <span className="inline-flex items-center gap-2"><span className="w-5 h-px bg-rust"></span><span className="italic text-rust">{leg.new}</span></span>
+            <span className="num text-warmgrey">50 × 70 cm</span>
+            <span className="font-serif italic text-warmgrey">{lang==="en"?"from €145, framed":lang==="ar"?"ابتداءً من ١٤٥ €، مؤطّرة":"à partir de 145 €, encadrée"}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Archive({ lang, onAdd, onOpen }) {
+  return (
+    <section id="archive" className="relative border-t border-ink/15 bg-parchdeep/40">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10 py-20 md:py-28">
+        <div className="mb-10 md:mb-14">
+          <SectionRule label={lang==="en"?"Forty-two plates, finite collection":lang==="ar"?"اثنتان وأربعون لوحة، مجموعة منتهية":"Quarante-deux planches, collection finie"} lang={lang}/>
+          <h2 className="mt-6 font-serif text-ink text-[28px] md:text-[40px]" style={{textAlign:isAr(lang)?"right":"left"}}>{C.archiveHeading[lang]}</h2>
+          <p className="mt-3 max-w-[640px] font-serif italic text-ink/75 text-[15px]" style={{textAlign:isAr(lang)?"right":"left"}}>{C.archiveSub[lang]}</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {C.archive.map((card)=>{
+            const mat=C.materials[lang][card.material];
+            return (
+              <article key={card.id} className="group bg-parchment border border-ink/20 p-3 md:p-4 flex flex-col">
+                <button onClick={()=>onOpen(card)} className="block text-start">
+                  <div className="border border-ink/15 bg-parchment overflow-hidden"><ArchiveMap kind={card.kind}/></div>
+                </button>
+                <div className="mt-3 md:mt-4 flex-1 flex flex-col">
+                  <div className={`flex items-baseline justify-between gap-3 ${isAr(lang)?"flex-row-reverse":""}`}>
+                    <button onClick={()=>onOpen(card)} className="font-serif text-ink text-[17px] hover:text-rust transition-colors">{card.city[lang]}, <span className="num">{card.year}</span></button>
+                    <span className="num text-[13.5px] text-ink/85">€{card.price}</span>
+                  </div>
+                  <div className={`mt-2 flex items-center gap-2 ${isAr(lang)?"flex-row-reverse":""}`}>
+                    <Pill>{mat}</Pill>
+                    <span className="font-serif italic text-warmgrey text-[12px]">{lang==="en"?"edition of 200":lang==="ar"?"إصدار من ٢٠٠":"édition de 200"}</span>
+                  </div>
+                  <div className={`mt-4 flex items-center gap-3 ${isAr(lang)?"flex-row-reverse":""}`}>
+                    <button onClick={()=>onAdd(card)} className="font-serif text-[13.5px] text-ink border-b border-ink/60 hover:text-rust hover:border-rust transition-colors pb-[1px]">{C.detail.add[lang]}</button>
+                    <button onClick={()=>onOpen(card)} className="font-serif italic text-[13px] text-warmgrey hover:text-ink transition-colors">{lang==="en"?"view plate":lang==="ar"?"اعرض اللوحة":"voir la planche"}</button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DetailPanel({ card, lang, onClose, onAdd }) {
+  if (!card) return null;
+  const rtl=isAr(lang);
+  const note=C.detail.notes[card.id]?.[lang] || "";
+  const materialOptions=[{key:"digital",price:25},{key:"print",price:75},{key:"framed",price:145}];
+  const [picked,setPicked]=useState(card.material);
+  useEffect(()=>{ setPicked(card.material); },[card.id,card.material]);
+  const pickedPrice=materialOptions.find(m=>m.key===picked)?.price;
+  return (
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-ink/40" onClick={onClose}></div>
+      <div className={`absolute top-0 ${rtl?"left-0":"right-0"} h-full w-full md:w-[640px] bg-parchment border-ink/30 overflow-y-auto`} dir={rtl?"rtl":"ltr"}>
+        <div className="p-5 md:p-8">
+          <div className={`flex items-center justify-between mb-5 ${rtl?"flex-row-reverse":""}`}>
+            <span className="smallcaps text-warmgrey text-[11px]">{lang==="en"?"Plate detail":lang==="ar"?"تفاصيل اللوحة":"Détail de la planche"}</span>
+            <button onClick={onClose} className="font-serif text-[13px] text-ink hover:text-rust border border-ink/30 hover:border-rust px-3 py-1 transition-colors">{C.detail.close[lang]}</button>
+          </div>
+          <div className="border border-ink/25 bg-parchment p-2"><div className="border border-ink/15 p-1"><ArchiveMap kind={card.kind}/></div></div>
+          <h3 className="mt-6 font-serif text-ink text-[28px]">{card.city[lang]}, <span className="num">{card.year}</span></h3>
+          <p className="mt-3 font-serif italic text-ink/80 text-[15.5px] leading-[1.7]">{note}</p>
+          <dl className="mt-6 border-t border-ink/20 divide-y divide-ink/15">
+            {[
+              [C.detail.paper[lang], C.detail.paperVal[lang]],
+              [C.detail.size[lang], C.detail.sizeVal[lang]],
+              [C.detail.source[lang], lang==="en"?"Library of Congress, G.M. Division":lang==="ar"?"مكتبة الكونغرس، قسم الخرائط":"Library of Congress, Division des cartes"],
+            ].map(([k,v],i)=>(
+              <div key={i} className="py-3 flex items-baseline justify-between gap-4">
+                <dt className="font-serif text-[12.5px] smallcaps text-warmgrey">{k}</dt>
+                <dd className="font-serif text-[14px] text-ink text-end">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-7">
+            <div className="smallcaps text-warmgrey text-[11px] mb-3">{lang==="en"?"Choose a finish":lang==="ar"?"اختر النّسخة":"Choisir la finition"}</div>
+            <div className="grid grid-cols-3 gap-2">
+              {materialOptions.map(opt=>(
+                <button key={opt.key} onClick={()=>setPicked(opt.key)} className={`border p-3 text-center transition-colors ${picked===opt.key?"border-ink bg-ink text-parchment":"border-ink/30 text-ink hover:border-ink"}`}>
+                  <div className="font-serif text-[14px]">{C.materials[lang][opt.key]}</div>
+                  <div className="num text-[12px] mt-1 opacity-80">€{opt.price}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className={`mt-7 flex items-center justify-between gap-4 ${rtl?"flex-row-reverse":""}`}>
+            <div>
+              <div className="num text-[18px] text-ink">€{pickedPrice}</div>
+              <div className="font-serif italic text-warmgrey text-[12px]">{lang==="en"?"ships in 10–14 days":lang==="ar"?"تُشحن خلال ١٠–١٤ يومًا":"expédié en 10–14 jours"}</div>
+            </div>
+            <button onClick={()=>onAdd({...card, price:pickedPrice, material:picked})} className="px-5 py-3 border border-ink text-ink hover:bg-ink hover:text-parchment font-serif text-[14.5px] transition-colors">{C.detail.add[lang]}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Provenance({ lang }) {
+  const p=C.provenance, rtl=isAr(lang);
+  return (
+    <section className="relative border-t border-ink/15">
+      <div className="max-w-[1100px] mx-auto px-5 md:px-10 py-20 md:py-24">
+        <SectionRule label={lang==="en"?"Where the plates come from":lang==="ar"?"مصادر اللوحات":"D’où viennent les planches"} lang={lang}/>
+        <div className={`mt-10 grid md:grid-cols-2 gap-10 md:gap-16 ${rtl?"md:[direction:rtl]":""}`}>
+          <div>
+            <h2 className="font-serif text-ink text-[28px] md:text-[34px]" style={{textAlign:rtl?"right":"left"}}>{p.heading[lang]}</h2>
+            <p className="mt-5 font-serif text-ink/85 text-[16.5px] leading-[1.75]" style={{textAlign:rtl?"right":"left"}}>{p.body[lang]}</p>
+          </div>
+          <ul className="divide-y divide-ink/15 border-y border-ink/20">
+            {p.sources.map((s)=>(
+              <li key={s.name} className="py-4 flex items-baseline justify-between gap-4">
+                <span className="font-serif text-ink text-[16px]">{s.name}</span>
+                <span className="font-serif italic text-warmgrey text-[13px] text-end max-w-[60%]">{s.note[lang]}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer({ lang }) {
+  const f=C.footer.cols[lang], rtl=isAr(lang);
+  const colTitles={en:["Navigate","Contact","Legal"],ar:["تنقّل","تواصل","قانون"],fr:["Naviguer","Contact","Mentions"]}[lang];
+  return (
+    <footer className="border-t border-ink/25 bg-parchdeep/60">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10 pt-14 pb-10">
+        <div className={`flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-10 border-b border-ink/20 ${rtl?"md:flex-row-reverse":""}`}>
+          <div>
+            <div className="font-serif text-ink text-[24px] md:text-[28px]">{C.brand[lang]}</div>
+            <div className="font-serif italic text-warmgrey text-[13.5px] mt-1">{C.tagline[lang]}</div>
+          </div>
+          <div className="font-serif italic text-warmgrey text-[13.5px] max-w-md" style={{textAlign:rtl?"right":"left"}}>{C.footer.printers[lang]}</div>
+        </div>
+        <div className={`grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-10 mt-10 ${rtl?"md:[direction:rtl]":""}`}>
+          {[f.nav,f.contact,f.legal].map((col,i)=>(
+            <div key={i}>
+              <div className="smallcaps text-warmgrey text-[11px] mb-3">{colTitles[i]}</div>
+              <ul className="space-y-1.5 font-serif text-ink text-[14px]">
+                {col.map((item,j)=><li key={j}>{item}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className={`mt-12 flex flex-col md:flex-row md:items-center md:justify-between gap-3 font-serif italic text-warmgrey text-[12px] ${rtl?"md:flex-row-reverse":""}`}>
+          <span>{C.footer.rights[lang]}</span>
+          <span className="num">{lang==="en"?"Set in Garamond and house monospace.":lang==="ar"?"بحروف غارامون وأحرف الدّار.":"Composé en Garamond et caractère maison."}</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  const [lang,setLang]=useState("en");
+  const [cart,setCart]=useState([]);
+  const [justAdded,setJustAdded]=useState(false);
+  const [openCard,setOpenCard]=useState(null);
+  const addTimer=useRef(null);
+  useEffect(()=>{
+    document.documentElement.lang=lang;
+    document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+  },[lang]);
+  useEffect(()=>{
+    document.body.style.overflow=openCard?"hidden":"";
+    return ()=>{document.body.style.overflow="";};
+  },[openCard]);
+  function add(card){
+    setCart(c=>[...c,card]);
+    setJustAdded(true);
+    if (addTimer.current) clearTimeout(addTimer.current);
+    addTimer.current=setTimeout(()=>setJustAdded(false),1800);
+  }
+  return (
+    <div className="min-h-screen flex flex-col" dir={lang==="ar"?"rtl":"ltr"}>
+      <Header lang={lang} setLang={setLang} cartCount={cart.length} justAdded={justAdded}/>
+      <Hero lang={lang}/>
+      <Editorial lang={lang}/>
+      <Collections lang={lang}/>
+      <Featured lang={lang}/>
+      <Archive lang={lang} onAdd={add} onOpen={setOpenCard}/>
+      <Provenance lang={lang}/>
+      <Footer lang={lang}/>
+      <DetailPanel card={openCard} lang={lang} onClose={()=>setOpenCard(null)} onAdd={(c)=>{add(c);setOpenCard(null);}}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(<App/>);
+</script>
+</body>
+</html>
