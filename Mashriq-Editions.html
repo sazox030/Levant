@@ -933,6 +933,34 @@ function Archive({ lang, onAdd, onOpen }) {
   );
 }
 
+function FramedPlate({ kind, finish="framed" }) {
+  const onWall = finish!=="digital";
+  const wall = onWall ? {background:"radial-gradient(125% 110% at 50% -10%, #efe7d8 0%, #e3d7c2 65%, #d6c8b0 100%)"} : {background:"#F4EEE4"};
+  return (
+    <div className="relative overflow-hidden" style={wall}>
+      <div className="mx-auto my-7 md:my-10" style={{width: finish==="framed"?"64%":"72%"}}>
+        {finish==="framed" ? (
+          <div className="shadow-[0_28px_55px_-18px_rgba(31,26,20,0.55)]">
+            <div className="p-[3.5%]" style={{background:"linear-gradient(135deg,#2a2118,#171109)"}}>
+              <div className="bg-parchment p-[8%]">
+                <div className="border border-ink/15"><ArchiveMap kind={kind}/></div>
+              </div>
+            </div>
+          </div>
+        ) : finish==="print" ? (
+          <div className="bg-parchment p-[4%] shadow-[0_18px_38px_-16px_rgba(31,26,20,0.42)]">
+            <div className="border border-ink/15"><ArchiveMap kind={kind}/></div>
+          </div>
+        ) : (
+          <div className="bg-parchment p-[3%] border border-ink/20">
+            <div className="border border-ink/15"><ArchiveMap kind={kind}/></div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function DetailPanel({ card, lang, onClose, onAdd }) {
   if (!card) return null;
   const rtl=isAr(lang);
@@ -950,7 +978,7 @@ function DetailPanel({ card, lang, onClose, onAdd }) {
             <span className="smallcaps text-warmgrey text-[11px]">{lang==="en"?"Plate detail":lang==="ar"?"تفاصيل اللوحة":"Détail de la planche"}</span>
             <button onClick={onClose} className="font-serif text-[13px] text-ink hover:text-rust border border-ink/30 hover:border-rust px-3 py-1 transition-colors">{C.detail.close[lang]}</button>
           </div>
-          <div className="border border-ink/25 bg-parchment p-2"><div className="border border-ink/15 p-1"><ArchiveMap kind={card.kind}/></div></div>
+          <div className="border border-ink/25 bg-parchment"><FramedPlate kind={card.kind} finish={picked}/></div>
           <h3 className="mt-6 font-serif text-ink text-[28px]">{card.city[lang]}, <span className="num">{card.year}</span></h3>
           <p className="mt-3 font-serif italic text-ink/80 text-[15.5px] leading-[1.7]">{note}</p>
           <dl className="mt-6 border-t border-ink/20 divide-y divide-ink/15">
