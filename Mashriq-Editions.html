@@ -1219,6 +1219,34 @@ function CartDrawer({ open, cart, lang, onClose, onRemove }) {
   );
 }
 
+function Lifestyle({ lang }) {
+  const rtl=isAr(lang);
+  const t={
+    en:{tag:"In your space",h:"Made to live with",p:"Each plate is printed to order on cotton paper and arrives ready to frame — for the home, the office, or as a gift."},
+    ar:{tag:"في فضائك",h:"صُنعت لتُعاش",p:"تُطبع كلّ لوحة عند الطلب على ورقٍ قطنيّ وتصلك جاهزة للتأطير — للبيت أو المكتب أو هديّةً."},
+    fr:{tag:"Chez vous",h:"Faites pour vivre avec",p:"Chaque planche est imprimée à la commande sur papier coton et arrive prête à encadrer — pour la maison, le bureau ou en cadeau."},
+  }[lang];
+  const imgs=["assets/lifestyle/living-room.jpg","assets/lifestyle/detail.jpg","assets/lifestyle/gift-desk.jpg","assets/lifestyle/hero.jpg"];
+  return (
+    <section className="relative border-t border-ink/15">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10 py-16 md:py-24">
+        <SectionRule label={t.tag} lang={lang}/>
+        <div className={`mt-6 flex flex-col md:flex-row md:items-end md:justify-between gap-3 ${rtl?"md:flex-row-reverse":""}`}>
+          <h2 className="font-serif text-ink text-[28px] md:text-[40px]" style={{textAlign:rtl?"right":"left"}}>{t.h}</h2>
+          <p className="font-serif italic text-warmgrey text-[14.5px] max-w-md" style={{textAlign:rtl?"right":"left"}}>{t.p}</p>
+        </div>
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {imgs.map((src,i)=>(
+            <div key={i} className="overflow-hidden border border-ink/15 bg-parchment">
+              <img src={src} alt="" loading="lazy" className="w-full h-full object-cover aspect-[3/2]"/>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function App() {
   const [lang,setLang]=useState("en");
   const [cart,setCart]=useState([]);
@@ -1257,6 +1285,7 @@ function App() {
       <Featured lang={lang}/>
       <Archive lang={lang} onAdd={add} onOpen={setOpenCard}/>
       <Provenance lang={lang}/>
+      <Lifestyle lang={lang}/>
       <FindYourCity lang={lang}/>
       <Footer lang={lang}/>
       <DetailPanel card={openCard} lang={lang} onClose={()=>setOpenCard(null)} onAdd={(c)=>{add(c);setOpenCard(null);}}/>
