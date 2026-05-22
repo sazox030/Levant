@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -42,6 +42,44 @@
   .no-bar::-webkit-scrollbar { display:none; }
   .no-bar { scrollbar-width: none; }
 </style>
+<meta name="description" content="Mashriq Editions — museum-quality reproduction prints of historic maps of the Levant (Beirut, Damascus, Jerusalem, Aleppo, Jaffa and more), 1850–1948. Printed to order on cotton paper, from presses in Beirut and Berlin." />
+<meta name="theme-color" content="#F4EEE4" />
+<!-- TODO: replace mashriqeditions.com with your production domain before launch -->
+<link rel="canonical" href="https://mashriqeditions.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Mashriq Editions" />
+<meta property="og:title" content="Mashriq Editions — Historic Maps of the Levant" />
+<meta property="og:description" content="Museum-quality reproduction prints of historic Levant maps, 1850–1948. Printed to order on cotton paper." />
+<meta property="og:url" content="https://mashriqeditions.com/" />
+<meta property="og:locale" content="en" />
+<meta property="og:locale:alternate" content="ar" />
+<meta property="og:locale:alternate" content="fr" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Mashriq Editions — Historic Maps of the Levant" />
+<meta name="twitter:description" content="Museum-quality reproduction prints of historic Levant maps, 1850–1948." />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Store",
+      "name": "Mashriq Editions",
+      "description": "Museum-quality reproduction prints of historic maps of the Levant, 1850–1948.",
+      "url": "https://mashriqeditions.com/",
+      "email": "orders@mashriq.editions",
+      "address": { "@type": "PostalAddress", "addressLocality": "Beirut", "streetAddress": "Mar Mikhael", "addressCountry": "LB" }
+    },
+    { "@type": "Product", "name": "Damascus, 1893", "category": "Map print", "offers": { "@type": "Offer", "price": "145", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" } },
+    { "@type": "Product", "name": "Jerusalem, 1883", "category": "Map print", "offers": { "@type": "Offer", "price": "75", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" } },
+    { "@type": "Product", "name": "Aleppo, 1912", "category": "Map print", "offers": { "@type": "Offer", "price": "75", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" } },
+    { "@type": "Product", "name": "Jaffa, 1878", "category": "Map print", "offers": { "@type": "Offer", "price": "25", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" } },
+    { "@type": "Product", "name": "Beirut, 1876", "category": "Map print", "offers": { "@type": "Offer", "price": "145", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" } },
+    { "@type": "Product", "name": "Tripoli, 1898", "category": "Map print", "offers": { "@type": "Offer", "price": "75", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" } },
+    { "@type": "Product", "name": "Antakya, 1906", "category": "Map print", "offers": { "@type": "Offer", "price": "25", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" } },
+    { "@type": "Product", "name": "Haifa, 1925", "category": "Map print", "offers": { "@type": "Offer", "price": "145", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" } }
+  ]
+}
+</script>
 </head>
 <body>
 <div id="app"></div>
@@ -729,7 +767,7 @@ function Header({ lang, setLang, cartCount, justAdded }) {
         </nav>
         <div className="flex items-center text-[13px] font-serif border border-ink/30">
           {langs.map((L,i)=>(
-            <button key={L} onClick={()=>setLang(L)} className={`px-2.5 py-1.5 ${i>0?"border-l border-ink/25":""} ${lang===L?"bg-ink text-parchment":"text-ink hover:bg-ink/10"} transition-colors`}>{C.langLabel[L]}</button>
+            <button key={L} onClick={()=>setLang(L)} className={`px-2.5 py-1.5 ${i>0?"border-s border-ink/25":""} ${lang===L?"bg-ink text-parchment":"text-ink hover:bg-ink/10"} transition-colors`}>{C.langLabel[L]}</button>
           ))}
         </div>
       </div>
