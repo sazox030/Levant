@@ -110,6 +110,23 @@ alter table public.orders                 enable row level security;
 alter table public.order_items            enable row level security;
 alter table public.newsletter_subscribers enable row level security;
 
+-- On a real Supabase project the `anon`, `authenticated`, and `service_role`
+-- roles always exist. Create them defensively so this file is also runnable on
+-- a vanilla Postgres (local CI, `supabase db reset`, etc.) without erroring.
+do $$
+begin
+  if not exists (select 1 from pg_roles where rolname = 'anon') then
+    create role anon nologin noinherit;
+  end if;
+  if not exists (select 1 from pg_roles where rolname = 'authenticated') then
+    create role authenticated nologin noinherit;
+  end if;
+  if not exists (select 1 from pg_roles where rolname = 'service_role') then
+    create role service_role nologin noinherit bypassrls;
+  end if;
+end
+$$;
+
 -- Drop-if-exists keeps this file idempotent (CREATE POLICY has no IF NOT EXISTS).
 
 -- Public catalog: read-only to everyone (anon + authenticated).
