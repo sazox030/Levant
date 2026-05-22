@@ -726,6 +726,33 @@ const SUPABASE_URL = "https://srfzinkxkwrpbzovkgxz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNyZnppbmt4a3dycGJ6b3ZrZ3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzOTAwMjMsImV4cCI6MjA5NDk2NjAyM30.o1-P3im0VVP0ueU-jAXy2W9crGCTVs9cJ8eMfUXP89c";
 const sb = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+// Real public-domain map scans per plate (verified PD; see assets/PD-MAP-SOURCES.md).
+// Cities without a confirmed-PD scan (Tripoli 1933 license caveat, Antakya none) fall back to SVG art.
+const PLATE_IMG = {
+  bey1876:"assets/maps/beirut.jpg",
+  dam1893:"assets/maps/damascus.jpg",
+  jer1883:"assets/maps/jerusalem.jpg",
+  alp1912:"assets/maps/aleppo.jpg",
+  jaf1878:"assets/maps/jaffa.jpg",
+  hai1925:"assets/maps/haifa.jpg",
+};
+const PLATE_SRC = {
+  bey1876:"Julius Löytved, Plan de Beyrouth, 1876",
+  dam1893:"Townsend MacCoun, Damascus, 1899",
+  jer1883:"Dr. Ermete Pierotti, Plan de Jérusalem, c.1865",
+  alp1912:"Plan général de la ville d'Halep, 19th c. (BnF Gallica)",
+  jaf1878:"Theodor Sandel, Jaffa, 1898 (Baedeker)",
+  hai1925:"Claude R. Conder, Haifa, 1875 (PEF)",
+};
+const PLATE_YEAR = { dam1893:"1899", jer1883:"c. 1865", alp1912:"c. 1880", jaf1878:"1898", hai1925:"1875" };
+const PLATE_NOTE = {
+  dam1893:{ en:"Townsend MacCoun's plan of Damascus from “The Holy Land in Geography and in History”, 1899 — reissued from a public-domain plate.", ar:"مخطّط دمشق لتاونسند ماكون من «الأرض المقدّسة في الجغرافيا والتاريخ»، ١٨٩٩ — معاد إصداره عن لوحة في الملكية العامّة.", fr:"Plan de Damas par Townsend MacCoun, tiré de « The Holy Land in Geography and in History », 1899 — réédité d’après une planche du domaine public." },
+  jer1883:{ en:"Dr. Ermete Pierotti’s “Plan de Jérusalem ancienne et moderne”, c.1865 — the city engineer’s survey of the Old City.", ar:"«مخطّط القدس القديمة والحديثة» للدكتور إرميتي بيروتي، نحو ١٨٦٥ — مسح مهندس المدينة للبلدة القديمة.", fr:"« Plan de Jérusalem ancienne et moderne » du Dr Ermete Pierotti, v. 1865 — relevé de la Vieille Ville par l’ingénieur de la ville." },
+  alp1912:{ en:"“Plan général de la ville d’Halep”, drawn by the vilayet engineers Chartier, Raghid and Bekir, 19th century (BnF Gallica).", ar:"«المخطّط العامّ لمدينة حلب»، رسمه مهندسو الولاية شارتييه ورشيد وبكر، القرن التاسع عشر (المكتبة الوطنية الفرنسية – غاليكا).", fr:"« Plan général de la ville d’Halep », dressé par les ingénieurs du vilayet Chartier, Raghid et Bekir, XIXᵉ siècle (BnF Gallica)." },
+  jaf1878:{ en:"Jaffa from the survey by Theodor Sandel, 1898, published by Baedeker — before the orchards gave way to the road north.", ar:"يافا عن مسح تيودور صانديل، ١٨٩٨، بنشر بيدِكِر — قبل أن تُفسح البساتين الطريق شمالًا.", fr:"Jaffa d’après le levé de Theodor Sandel, 1898, publié par Baedeker — avant que les vergers ne cèdent la place à la route du nord." },
+  hai1925:{ en:"Claude R. Conder’s plan of Haifa for the Palestine Exploration Fund, 1875 — at the foot of Mount Carmel.", ar:"مخطّط حيفا لكلود ر. كوندر لصندوق استكشاف فلسطين، ١٨٧٥ — عند سفح جبل الكرمل.", fr:"Plan de Haïfa par Claude R. Conder pour le Palestine Exploration Fund, 1875 — au pied du mont Carmel." },
+};
+
 function Pill({ children, className="" }) {
   return <span className={`num inline-flex items-center justify-center text-[10px] leading-none px-1.5 py-1 rounded-sm border border-ink/40 text-ink/80 ${className}`}>{children}</span>;
 }
@@ -908,11 +935,11 @@ function Archive({ lang, onAdd, onOpen }) {
             return (
               <article key={card.id} className="group bg-parchment border border-ink/20 p-3 md:p-4 flex flex-col">
                 <button onClick={()=>onOpen(card)} className="block text-start">
-                  <div className="border border-ink/15 bg-parchment overflow-hidden"><ArchiveMap kind={card.kind}/></div>
+                  <div className="border border-ink/15 bg-parchment overflow-hidden aspect-[7/5]">{PLATE_IMG[card.id] ? <img src={PLATE_IMG[card.id]} alt={card.city.en+" — historic map"} loading="lazy" className="w-full h-full object-cover"/> : <ArchiveMap kind={card.kind}/>}</div>
                 </button>
                 <div className="mt-3 md:mt-4 flex-1 flex flex-col">
                   <div className={`flex items-baseline justify-between gap-3 ${isAr(lang)?"flex-row-reverse":""}`}>
-                    <button onClick={()=>onOpen(card)} className="font-serif text-ink text-[17px] hover:text-rust transition-colors">{card.city[lang]}, <span className="num">{card.year}</span></button>
+                    <button onClick={()=>onOpen(card)} className="font-serif text-ink text-[17px] hover:text-rust transition-colors">{card.city[lang]}, <span className="num">{PLATE_YEAR[card.id]||card.year}</span></button>
                     <span className="num text-[13.5px] text-ink/85">€{card.price}</span>
                   </div>
                   <div className={`mt-2 flex items-center gap-2 ${isAr(lang)?"flex-row-reverse":""}`}>
@@ -933,7 +960,7 @@ function Archive({ lang, onAdd, onOpen }) {
   );
 }
 
-function FramedPlate({ kind, finish="framed" }) {
+function FramedPlate({ kind, img, finish="framed" }) {
   const onWall = finish!=="digital";
   const wall = onWall ? {background:"radial-gradient(125% 110% at 50% -10%, #efe7d8 0%, #e3d7c2 65%, #d6c8b0 100%)"} : {background:"#F4EEE4"};
   return (
@@ -943,17 +970,17 @@ function FramedPlate({ kind, finish="framed" }) {
           <div className="shadow-[0_28px_55px_-18px_rgba(31,26,20,0.55)]">
             <div className="p-[3.5%]" style={{background:"linear-gradient(135deg,#2a2118,#171109)"}}>
               <div className="bg-parchment p-[8%]">
-                <div className="border border-ink/15"><ArchiveMap kind={kind}/></div>
+                <div className="border border-ink/15">{img ? <img src={img} alt="" className="w-full h-auto block"/> : <ArchiveMap kind={kind}/>}</div>
               </div>
             </div>
           </div>
         ) : finish==="print" ? (
           <div className="bg-parchment p-[4%] shadow-[0_18px_38px_-16px_rgba(31,26,20,0.42)]">
-            <div className="border border-ink/15"><ArchiveMap kind={kind}/></div>
+            <div className="border border-ink/15">{img ? <img src={img} alt="" className="w-full h-auto block"/> : <ArchiveMap kind={kind}/>}</div>
           </div>
         ) : (
           <div className="bg-parchment p-[3%] border border-ink/20">
-            <div className="border border-ink/15"><ArchiveMap kind={kind}/></div>
+            <div className="border border-ink/15">{img ? <img src={img} alt="" className="w-full h-auto block"/> : <ArchiveMap kind={kind}/>}</div>
           </div>
         )}
       </div>
@@ -964,7 +991,7 @@ function FramedPlate({ kind, finish="framed" }) {
 function DetailPanel({ card, lang, onClose, onAdd }) {
   if (!card) return null;
   const rtl=isAr(lang);
-  const note=C.detail.notes[card.id]?.[lang] || "";
+  const note=(PLATE_NOTE[card.id]&&PLATE_NOTE[card.id][lang]) || C.detail.notes[card.id]?.[lang] || "";
   const materialOptions=[{key:"digital",price:25},{key:"print",price:75},{key:"framed",price:145}];
   const [picked,setPicked]=useState(card.material);
   useEffect(()=>{ setPicked(card.material); },[card.id,card.material]);
@@ -978,14 +1005,14 @@ function DetailPanel({ card, lang, onClose, onAdd }) {
             <span className="smallcaps text-warmgrey text-[11px]">{lang==="en"?"Plate detail":lang==="ar"?"تفاصيل اللوحة":"Détail de la planche"}</span>
             <button onClick={onClose} className="font-serif text-[13px] text-ink hover:text-rust border border-ink/30 hover:border-rust px-3 py-1 transition-colors">{C.detail.close[lang]}</button>
           </div>
-          <div className="border border-ink/25 bg-parchment"><FramedPlate kind={card.kind} finish={picked}/></div>
-          <h3 className="mt-6 font-serif text-ink text-[28px]">{card.city[lang]}, <span className="num">{card.year}</span></h3>
+          <div className="border border-ink/25 bg-parchment"><FramedPlate kind={card.kind} img={PLATE_IMG[card.id]} finish={picked}/></div>
+          <h3 className="mt-6 font-serif text-ink text-[28px]">{card.city[lang]}, <span className="num">{PLATE_YEAR[card.id]||card.year}</span></h3>
           <p className="mt-3 font-serif italic text-ink/80 text-[15.5px] leading-[1.7]">{note}</p>
           <dl className="mt-6 border-t border-ink/20 divide-y divide-ink/15">
             {[
               [C.detail.paper[lang], C.detail.paperVal[lang]],
               [C.detail.size[lang], C.detail.sizeVal[lang]],
-              [C.detail.source[lang], lang==="en"?"Library of Congress, G.M. Division":lang==="ar"?"مكتبة الكونغرس، قسم الخرائط":"Library of Congress, Division des cartes"],
+              [C.detail.source[lang], PLATE_SRC[card.id] || (lang==="en"?"Public-domain archive":lang==="ar"?"أرشيف الملكية العامة":"Archive du domaine public")],
             ].map(([k,v],i)=>(
               <div key={i} className="py-3 flex items-baseline justify-between gap-4">
                 <dt className="font-serif text-[12.5px] smallcaps text-warmgrey">{k}</dt>
@@ -1150,7 +1177,7 @@ function CartDrawer({ open, cart, lang, onClose, onRemove }) {
   const rate=bundle(cart.length);
   const discount=Math.round(gross*rate);
   const total=gross-discount;
-  const lines=cart.map(c=>`${c.city[lang]}, ${c.year} — ${C.materials[lang][c.material]} — €${c.price}`).join("\n");
+  const lines=cart.map(c=>`${c.city[lang]}, ${PLATE_YEAR[c.id]||c.year} — ${C.materials[lang][c.material]} — €${c.price}`).join("\n");
   const body=encodeURIComponent(`${lines}\n\n${t.subtotal}: €${gross}`+(discount?`\n${t.discount}: −€${discount}`:"")+`\n${t.total}: €${total}`);
   const mailto=`mailto:orders@mashriq.editions?subject=${encodeURIComponent("Order — Mashriq Editions")}&body=${body}`;
   return (
@@ -1169,7 +1196,7 @@ function CartDrawer({ open, cart, lang, onClose, onRemove }) {
                   <li key={i} className="flex items-start gap-3">
                     <div className="w-16 shrink-0 border border-ink/15 bg-parchment"><ArchiveMap kind={c.kind}/></div>
                     <div className="flex-1">
-                      <div className="font-serif text-ink text-[14.5px]">{c.city[lang]}, <span className="num">{c.year}</span></div>
+                      <div className="font-serif text-ink text-[14.5px]">{c.city[lang]}, <span className="num">{PLATE_YEAR[c.id]||c.year}</span></div>
                       <div className="flex items-center gap-2 mt-1"><Pill>{C.materials[lang][c.material]}</Pill><span className="num text-[13px] text-ink/80">€{c.price}</span></div>
                       <button onClick={()=>onRemove(i)} className="mt-1 font-serif italic text-[12px] text-warmgrey hover:text-rust transition-colors">{t.remove}</button>
                     </div>
