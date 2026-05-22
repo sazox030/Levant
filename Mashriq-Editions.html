@@ -1026,7 +1026,20 @@ function Footer({ lang }) {
             <div key={i}>
               <div className="smallcaps text-warmgrey text-[11px] mb-3">{colTitles[i]}</div>
               <ul className="space-y-1.5 font-serif text-ink text-[14px]">
-                {col.map((item,j)=><li key={j}>{item}</li>)}
+                {col.map((item,j)=>{
+                  const navHrefs=["#collections","#archive","#about","#about"];
+                  let href=null;
+                  if (i===0) href=navHrefs[j];                                  // Navigate -> in-page sections
+                  else if (i===1 && j===0) href="mailto:"+item;                 // Contact -> email (first row only)
+                  else if (i===2) href="mailto:orders@mashriq.editions?subject="+encodeURIComponent(item); // Legal -> inquiry
+                  return (
+                    <li key={j}>
+                      {href
+                        ? <a href={href} className="hover:text-rust transition-colors">{item}</a>
+                        : <span>{item}</span>}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
