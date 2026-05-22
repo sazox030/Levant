@@ -743,7 +743,7 @@ function SectionRule({ label, lang }) {
   );
 }
 
-function Header({ lang, setLang, cartCount, justAdded }) {
+function Header({ lang, setLang, cartCount, justAdded, onCartClick }) {
   const n=C.nav[lang];
   const langs=["en","ar","fr"];
   return (
@@ -757,13 +757,13 @@ function Header({ lang, setLang, cartCount, justAdded }) {
           <a href="#collections" className="hover:text-rust transition-colors">{n.collections}</a>
           <a href="#archive" className="hover:text-rust transition-colors">{n.archive}</a>
           <a href="#about" className="hover:text-rust transition-colors">{n.about}</a>
-          <a href="#archive" className="relative inline-flex items-center gap-2 hover:text-rust transition-colors">
+          <button type="button" onClick={onCartClick} className="relative inline-flex items-center gap-2 hover:text-rust transition-colors">
             <span>{n.cart}</span>
             <span className="num inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10.5px] border border-ink/55 text-ink/80 leading-none">{cartCount}</span>
             <span aria-live="polite" className={`absolute -bottom-5 ${isAr(lang)?"right-0":"left-0"} text-[10.5px] italic text-rust transition-opacity duration-500 ${justAdded?"opacity-100":"opacity-0"}`}>
               {lang==="en"?"added to cart":lang==="ar"?"أُضيف إلى السلّة":"ajouté au panier"}
             </span>
-          </a>
+          </button>
         </nav>
         <div className="flex items-center text-[13px] font-serif border border-ink/30">
           {langs.map((L,i)=>(
@@ -776,7 +776,7 @@ function Header({ lang, setLang, cartCount, justAdded }) {
           <a href="#collections">{n.collections}</a>
           <a href="#archive">{n.archive}</a>
           <a href="#about">{n.about}</a>
-          <a href="#archive" className="inline-flex items-center gap-1.5">{n.cart} <Pill>{cartCount}</Pill></a>
+          <button type="button" onClick={onCartClick} className="inline-flex items-center gap-1.5">{n.cart} <Pill>{cartCount}</Pill></button>
         </div>
       </div>
     </header>
@@ -1053,20 +1053,131 @@ function Footer({ lang }) {
   );
 }
 
+function bundle(count){ return count>=3?0.25:count===2?0.15:0; }
+
+function TrustStrip({ lang }) {
+  const items = lang==="en"
+    ? ["Public-domain source plates","300gsm cotton rag · archival","Ships worldwide · 10–14 days","Numbered edition of 200"]
+    : lang==="ar"
+    ? ["لوحات من الملكية العامّة","ورق قطن أرشيفي ٣٠٠غ","شحن عالميّ · ١٠–١٤ يومًا","إصدار مرقّم من ٢٠٠"]
+    : ["Planches du domaine public","Papier coton 300g · archival","Livraison mondiale · 10–14 j","Édition numérotée de 200"];
+  return (
+    <div className="border-y border-ink/15 bg-parchment/70">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10 py-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+        {items.map((t,i)=><div key={i} className="smallcaps text-warmgrey text-[11px] md:text-[12px]">{t}</div>)}
+      </div>
+    </div>
+  );
+}
+
+function FindYourCity({ lang }) {
+  const rtl=isAr(lang);
+  const [email,setEmail]=useState("");
+  const [done,setDone]=useState(false);
+  const t={
+    en:{tag:"From the archive",h:"Find your city",p:"Tell us the city your family is from — we'll write when its plate is ready, and send new releases from the archive.",ph:"you@example.com",btn:"Keep me posted",ok:"Thank you — you're on the list."},
+    ar:{tag:"من الأرشيف",h:"ابحث عن مدينتك",p:"أخبِرنا بمدينة عائلتك — سنكتب إليك حين تجهز لوحتها، ونرسل لك إصدارات الأرشيف الجديدة.",ph:"you@example.com",btn:"أبقِني على اطّلاع",ok:"شكرًا — أنت الآن على القائمة."},
+    fr:{tag:"De l'archive",h:"Trouvez votre ville",p:"Dites-nous la ville de votre famille — nous écrirons dès que sa planche sera prête, avec les nouveautés de l'archive.",ph:"vous@exemple.com",btn:"Tenez-moi informé",ok:"Merci — vous êtes inscrit."},
+  }[lang];
+  function submit(e){
+    e.preventDefault();
+    if(!email) return;
+    try{ const k="mashriq_subs"; const a=JSON.parse(localStorage.getItem(k)||"[]"); a.push({email,lang,at:Date.now()}); localStorage.setItem(k,JSON.stringify(a)); }catch(_){}
+    setDone(true);
+  }
+  return (
+    <section className="border-t border-ink/15 bg-parchdeep/40">
+      <div className="max-w-[760px] mx-auto px-6 md:px-8 py-16 md:py-20 text-center">
+        <p className="smallcaps text-warmgrey text-[11px] mb-4">{t.tag}</p>
+        <h2 className="font-serif text-ink text-[26px] md:text-[34px]">{t.h}</h2>
+        <p className="mt-3 font-serif italic text-ink/75 text-[15px] md:text-[16px]">{t.p}</p>
+        {done
+          ? <p className="mt-6 font-serif text-rust text-[16px]">{t.ok}</p>
+          : <form onSubmit={submit} className={`mt-7 flex flex-col sm:flex-row gap-3 justify-center ${rtl?"sm:flex-row-reverse":""}`}>
+              <input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder={t.ph} dir="ltr"
+                className="sm:w-[280px] bg-parchment border border-ink/30 px-4 py-3 font-serif text-[15px] text-ink placeholder:text-warmgrey/60 focus:outline-none focus:border-ink"/>
+              <button type="submit" className="px-6 py-3 border border-ink bg-ink text-parchment hover:bg-transparent hover:text-ink font-serif text-[15px] transition-colors whitespace-nowrap">{t.btn}</button>
+            </form>}
+      </div>
+    </section>
+  );
+}
+
+function CartDrawer({ open, cart, lang, onClose, onRemove }) {
+  const rtl=isAr(lang);
+  const t={
+    en:{title:"Your cart",empty:"Your cart is empty.",browse:"Browse the archive",subtotal:"Subtotal",discount:"Collector's discount",total:"Total",checkout:"Place order by email",save2:"Add one more plate — save 15%.",save3:"Add a third — save 25%.",remove:"Remove",ships:"Ships in 10–14 days · order confirmed by email"},
+    ar:{title:"سلّتك",empty:"سلّتك فارغة.",browse:"تصفّح الأرشيف",subtotal:"المجموع",discount:"خصم المقتني",total:"الإجمالي",checkout:"اطلب عبر البريد",save2:"أضِف لوحة أخرى — وفّر ١٥٪.",save3:"أضِف ثالثة — وفّر ٢٥٪.",remove:"إزالة",ships:"تُشحن خلال ١٠–١٤ يومًا · يُؤكَّد الطلب بالبريد"},
+    fr:{title:"Votre panier",empty:"Votre panier est vide.",browse:"Parcourir l'archive",subtotal:"Sous-total",discount:"Remise collectionneur",total:"Total",checkout:"Commander par e-mail",save2:"Ajoutez une planche — économisez 15 %.",save3:"Ajoutez-en une troisième — 25 %.",remove:"Retirer",ships:"Expédié en 10–14 j · commande confirmée par e-mail"},
+  }[lang];
+  const gross=cart.reduce((s,c)=>s+(c.price||0),0);
+  const rate=bundle(cart.length);
+  const discount=Math.round(gross*rate);
+  const total=gross-discount;
+  const lines=cart.map(c=>`${c.city[lang]}, ${c.year} — ${C.materials[lang][c.material]} — €${c.price}`).join("\n");
+  const body=encodeURIComponent(`${lines}\n\n${t.subtotal}: €${gross}`+(discount?`\n${t.discount}: −€${discount}`:"")+`\n${t.total}: €${total}`);
+  const mailto=`mailto:orders@mashriq.editions?subject=${encodeURIComponent("Order — Mashriq Editions")}&body=${body}`;
+  return (
+    <div className={`fixed inset-0 z-50 ${open?"":"pointer-events-none"}`} aria-hidden={!open}>
+      <div className={`absolute inset-0 bg-ink/40 transition-opacity duration-300 ${open?"opacity-100":"opacity-0"}`} onClick={onClose}></div>
+      <div className={`absolute top-0 ${rtl?"left-0":"right-0"} h-full w-full max-w-[420px] bg-parchment flex flex-col transition-transform duration-300 ${open?"translate-x-0":(rtl?"-translate-x-full":"translate-x-full")}`} dir={rtl?"rtl":"ltr"} role="dialog" aria-modal="true">
+        <div className="flex items-center justify-between p-5 border-b border-ink/15">
+          <span className="smallcaps text-warmgrey text-[11px]">{t.title}</span>
+          <button onClick={onClose} className="font-serif text-[13px] text-ink hover:text-rust border border-ink/30 hover:border-rust px-3 py-1 transition-colors">{C.detail.close[lang]}</button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-5">
+          {cart.length===0
+            ? <div className="text-center mt-10"><p className="font-serif italic text-warmgrey">{t.empty}</p><button onClick={onClose} className="mt-4 font-serif text-ink border-b border-ink/60 hover:text-rust hover:border-rust pb-[1px]">{t.browse}</button></div>
+            : <ul className="space-y-4">
+                {cart.map((c,i)=>(
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="w-16 shrink-0 border border-ink/15 bg-parchment"><ArchiveMap kind={c.kind}/></div>
+                    <div className="flex-1">
+                      <div className="font-serif text-ink text-[14.5px]">{c.city[lang]}, <span className="num">{c.year}</span></div>
+                      <div className="flex items-center gap-2 mt-1"><Pill>{C.materials[lang][c.material]}</Pill><span className="num text-[13px] text-ink/80">€{c.price}</span></div>
+                      <button onClick={()=>onRemove(i)} className="mt-1 font-serif italic text-[12px] text-warmgrey hover:text-rust transition-colors">{t.remove}</button>
+                    </div>
+                  </li>
+                ))}
+              </ul>}
+        </div>
+        {cart.length>0 &&
+          <div className="border-t border-ink/15 p-5 space-y-2">
+            {cart.length===1 && <p className="font-serif italic text-rust text-[13px]">{t.save2}</p>}
+            {cart.length===2 && <p className="font-serif italic text-rust text-[13px]">{t.save3}</p>}
+            <div className="flex justify-between font-serif text-[14px]"><span className="text-warmgrey">{t.subtotal}</span><span className="num">€{gross}</span></div>
+            {discount>0 && <div className="flex justify-between font-serif text-[14px] text-rust"><span>{t.discount} · {Math.round(rate*100)}%</span><span className="num">−€{discount}</span></div>}
+            <div className="flex justify-between font-serif text-[16px] text-ink border-t border-ink/15 pt-2"><span>{t.total}</span><span className="num">€{total}</span></div>
+            <a href={mailto} className="block text-center mt-2 px-5 py-3 border border-ink bg-ink text-parchment hover:bg-transparent hover:text-ink font-serif text-[15px] transition-colors">{t.checkout}</a>
+            <p className="text-center font-serif italic text-warmgrey text-[11px]">{t.ships}</p>
+          </div>}
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [lang,setLang]=useState("en");
   const [cart,setCart]=useState([]);
   const [justAdded,setJustAdded]=useState(false);
   const [openCard,setOpenCard]=useState(null);
+  const [cartOpen,setCartOpen]=useState(false);
   const addTimer=useRef(null);
   useEffect(()=>{
     document.documentElement.lang=lang;
     document.documentElement.dir=lang==="ar"?"rtl":"ltr";
   },[lang]);
   useEffect(()=>{
-    document.body.style.overflow=openCard?"hidden":"";
+    document.body.style.overflow=(openCard||cartOpen)?"hidden":"";
     return ()=>{document.body.style.overflow="";};
-  },[openCard]);
+  },[openCard,cartOpen]);
+  useEffect(()=>{
+    if(!cartOpen) return;
+    const onKey=e=>{ if(e.key==="Escape") setCartOpen(false); };
+    window.addEventListener("keydown",onKey);
+    return ()=>window.removeEventListener("keydown",onKey);
+  },[cartOpen]);
+  function removeFromCart(i){ setCart(c=>c.filter((_,idx)=>idx!==i)); }
   function add(card){
     setCart(c=>[...c,card]);
     setJustAdded(true);
@@ -1075,15 +1186,18 @@ function App() {
   }
   return (
     <div className="min-h-screen flex flex-col" dir={lang==="ar"?"rtl":"ltr"}>
-      <Header lang={lang} setLang={setLang} cartCount={cart.length} justAdded={justAdded}/>
+      <Header lang={lang} setLang={setLang} cartCount={cart.length} justAdded={justAdded} onCartClick={()=>setCartOpen(true)}/>
       <Hero lang={lang}/>
+      <TrustStrip lang={lang}/>
       <Editorial lang={lang}/>
       <Collections lang={lang}/>
       <Featured lang={lang}/>
       <Archive lang={lang} onAdd={add} onOpen={setOpenCard}/>
       <Provenance lang={lang}/>
+      <FindYourCity lang={lang}/>
       <Footer lang={lang}/>
       <DetailPanel card={openCard} lang={lang} onClose={()=>setOpenCard(null)} onAdd={(c)=>{add(c);setOpenCard(null);}}/>
+      <CartDrawer open={cartOpen} cart={cart} lang={lang} onClose={()=>setCartOpen(false)} onRemove={removeFromCart}/>
     </div>
   );
 }
