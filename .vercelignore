@@ -1,0 +1,10 @@
+# Only the static storefront + vercel.json should be published.
+# Keep internal/backend files out of the public deployment.
+.claude/
+.mcp.json
+supabase/
+.env.example
+README.md
+DEPLOY.md
+SECURITY-NOTES.md
+AUDIT-a11y-seo.md
